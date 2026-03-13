@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catalytic Revenue Impact Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue:    #1a56db;
+    --blue-lt: #eff4ff;
+    --green:   #0e9f6e;
+    --green-lt:#f0fdf4;
+    --slate:   #1e293b;
+    --muted:   #64748b;
+    --border:  #e2e8f0;
+    --bg:      #f8fafc;
+    --white:   #ffffff;
+    --r:       10px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--slate);
+    min-height: 100vh;
+  }
+
+  .hdr { background:var(--white); border-bottom:1px solid var(--border); padding:24px 20px 18px; text-align:center; }
+  .hdr h1 { font-family:'DM Serif Display', serif; font-size:clamp(22px,5vw,36px); font-weight:400; letter-spacing:-.5px; line-height:1.2; }
+  .hdr p  { color:var(--muted); font-size:14px; margin-top:6px; }
+
+  .page { max-width:960px; margin:0 auto; padding:20px 16px 48px; }
+
+  .card { background:var(--white); border:1px solid var(--border); border-radius:var(--r); padding:22px; margin-bottom:18px; }
+  .card-title { font-weight:700; font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:16px; }
+
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media(max-width:520px){ .form-row { grid-template-columns:1fr; } }
+  .fg { display:flex; flex-direction:column; gap:5px; }
+  label { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+  input, select {
+    width:100%; padding:11px 13px;
+    font-size:16px;
+    border:1.5px solid var(--border); border-radius:8px;
+    background:var(--white); color:var(--slate);
+    -webkit-appearance:none; appearance:none;
+  }
+  select {
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 12px center; padding-right:36px;
+  }
+  input:focus, select:focus { outline:none; border-color:var(--blue); box-shadow:0 0 0 3px rgba(26,86,219,.12); }
+
+  .btn {
+    display:block; width:100%; margin-top:18px; padding:14px;
+    background:var(--blue); color:#fff; border:none; border-radius:8px;
+    font-size:15px; font-weight:700; cursor:pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition:background .15s;
+  }
+  .btn:hover  { background:#1447c4; }
+  .btn:active { background:#0f3ba8; }
+
+  .stats { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:18px; }
+  @media(max-width:380px){ .stats { grid-template-columns:1fr; } }
+  .sc { border-radius:var(--r); padding:16px; border:1px solid transparent; }
+  .sc.b { background:var(--blue-lt); border-color:#c7d7f9; }
+  .sc.g { background:var(--green-lt); border-color:#a7f3d0; }
+  .sc-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:5px; }
+  .sc-val { font-family:'DM Serif Display', serif; font-size:clamp(20px,4vw,28px); font-weight:400; line-height:1.1; }
+  .sc.b .sc-val { color:var(--blue); }
+  .sc.g .sc-val { color:var(--green); }
+
+  .chart-outer { width:100%; }
+  #chart-container { width:100%; }
+
+  .legend { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:12px; font-size:13px; }
+  .leg { display:flex; align-items:center; gap:6px; }
+  .leg-dot { width:11px; height:11px; border-radius:50%; flex-shrink:0; }
+
+  .tscroll { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  table { width:100%; border-collapse:collapse; font-size:13px; min-width:420px; }
+  thead tr { background:var(--bg); border-bottom:2px solid var(--border); }
+  th { padding:9px 10px; text-align:right; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); }
+  th:first-child { text-align:left; }
+  td { padding:9px 10px; text-align:right; border-bottom:1px solid var(--border); color:var(--slate); }
+  td:first-child { text-align:left; font-weight:600; }
+  tbody tr:last-child td { border-bottom:none; }
+  .hr td { background:var(--blue-lt); font-weight:700; }
+
+  .assum { font-size:12px; color:var(--muted); line-height:1.9; }
+  .assum strong { color:var(--slate); }
+
+  #tip {
+    position:fixed; background:rgba(15,23,42,.92); color:#fff;
+    padding:9px 12px; border-radius:8px; font-size:12px; line-height:1.7;
+    pointer-events:none; display:none; z-index:9999; max-width:190px;
+    box-shadow:0 4px 20px rgba(0,0,0,.25);
+  }
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>Catalytic Revenue Impact Calculator</h1>
+  <p>Estimate the long-term impact of grant donations on water infrastructure</p>
+</div>
+
+<div class="page">
+
+  <div class="card">
+    <div class="card-title">Donation Parameters</div>
+    <div class="form-row">
+      <div class="fg">
+        <label for="donAmt">Annual Donation (USD)</label>
+        <input type="number" id="donAmt" value="5000" min="1" step="100">
+      </div>
+      <div class="fg">
+        <label for="donYrs">Donation Period</label>
+        <select id="donYrs">
+          <option value="3">3 years</option>
+          <option value="5" selected>5 years</option>
+          <option value="10">10 years</option>
+          <option value="20">20 years</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row" style="margin-top:12px">
+      <div class="fg">
+        <label for="projYrs">Project Impact Over</label>
+        <select id="projYrs">
+          <option value="10" selected>10 years</option>
+          <option value="15">15 years</option>
+          <option value="20">20 years</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" onclick="calculate()">Calculate Impact</button>
+  </div>
+
+  <div id="results" style="display:none">
+
+    <div class="stats">
+      <div class="sc b"><div class="sc-label">Total Donations</div><div class="sc-val" id="rDon">—</div></div>
+      <div class="sc b"><div class="sc-label">Total Capex Unlocked</div><div class="sc-val" id="rCap">—</div></div>
+      <div class="sc g"><div class="sc-label">Cumulative Impact</div><div class="sc-val" id="rImp">—</div></div>
+      <div class="sc g"><div class="sc-label">Retained Earnings (end)</div><div class="sc-val" id="rRE">—</div></div>
+      <div class="sc b" style="grid-column:1/-1"><div class="sc-label">People Served (cumulative HH connections × 9.7)</div><div class="sc-val" id="rPeople">—</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Cumulative Impact vs. Donations</div>
+      <div class="legend">
+        <span class="leg"><span class="leg-dot" style="background:#1a56db"></span>Cumulative Donations</span>
+        <span class="leg"><span class="leg-dot" style="background:#0e9f6e"></span>Cumulative Impact</span>
+      </div>
+      <div class="chart-outer">
+        <div id="chart-container"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Year-by-Year Breakdown</div>
+      <div class="tscroll">
+        <table>
+          <thead><tr>
+            <th>Year</th><th>Donation</th><th>Cum. Donations</th>
+            <th>Capex / RE</th><th>Cum. Impact</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Model Assumptions</div>
+      <div class="assum">
+        <strong>Debt multiplier:</strong> Starts at 30% (Year 1), increases by 5%/yr to 50% (Year 5), then fixed at 50% — representing the average leveraging effect across the 2026–2031 window as the model matures &nbsp;|&nbsp;
+        <strong>Customer deposit ratio:</strong> ~24.45% &nbsp;|&nbsp;
+        <strong>HH connection cost:</strong> $425 &nbsp;|&nbsp;
+        <strong>Tariff:</strong> $1.40/m³ &nbsp;|&nbsp;
+        <strong>HH monthly volume:</strong> 4.4 m³ &nbsp;|&nbsp;
+        <strong>Retained earnings:</strong> 20% of annual sales &nbsp;|&nbsp;
+        <strong>Post-donation RE growth:</strong> 2%/yr &nbsp;|&nbsp;
+        <strong>People served:</strong> Cumulative HH connections &times; 9.7 (avg. household size)
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="tip"></div>
+
+<script>
+// ─── Constants ─────────────────────────────────────────────────────────────
+const C = {
+  // Debt multiplier ramps 30%→35%→40%→45%→50% over donation years 1-5,
+  // then stays fixed at 50% for all subsequent years
+  DEBT_MULT_BY_YEAR: [0.30, 0.35, 0.40, 0.45, 0.50],
+  DEBT_MULT_MAX:     0.50,
+  CUST_DEP:   1222.588235 / 5000,
+  HH_COST:    425,
+  PCT_HH:     0.999,
+  TARIFF:     1.4,
+  HH_VOL:     4.4,
+  RETAIL_VOL: 40,
+  NUMA_PCT:   0.001,
+  NUMA_COST:  52000,
+  RE_PCT:     0.20,
+  RE_GROWTH:  0.02,
+  HH_SIZE:    9.7,
+};
+
+// ─── Core calculation ──────────────────────────────────────────────────────
+function calcImpact(annDon, donYrs, projYrs) {
+  const custDep   = annDon * C.CUST_DEP;
+  const numaPerYr = (annDon * C.PCT_HH * C.NUMA_PCT) / C.NUMA_COST;
+  const depC      = custDep / C.HH_COST;
+
+  const rows = [];
+  let cumDon = 0, cumImp = 0, totSales = 0, lastRE = 0, cumHH = 0;
+
+  for (let yr = 1; yr <= projYrs; yr++) {
+    const isDon  = yr <= donYrs;
+    const don    = isDon ? annDon : 0;
+    cumDon      += don;
+    let yrCap = 0, yrRE = 0, yrHH = 0;
+
+    if (isDon) {
+      // Ramping multiplier: yr 1=30%, yr 2=35% ... yr 5+=50%
+      const multIdx  = Math.min(yr - 1, C.DEBT_MULT_BY_YEAR.length - 1);
+      const debtMult = C.DEBT_MULT_BY_YEAR[multIdx];
+      const debt     = annDon * debtMult;
+      const capexYr  = annDon + debt + custDep;
+      const directC  = ((annDon * C.PCT_HH) + debt) / C.HH_COST;
+      yrHH           = directC + depC;
+      cumHH         += yrHH;
+
+      const newSales = (yrHH * C.HH_VOL * 12 * C.TARIFF) +
+                       ((numaPerYr * 3) * (C.TARIFF * 0.7) * 12 * C.RETAIL_VOL);
+      yrCap     = capexYr;
+      totSales += newSales;
+      yrRE      = totSales * C.RE_PCT;
+      lastRE    = yrRE;
+      cumImp   += yrCap;
+    } else {
+      yrRE   = lastRE * Math.pow(1 + C.RE_GROWTH, yr - donYrs);
+      cumImp += yrRE;
+    }
+    rows.push({ yr, don, cumDon, yrCap, cumImp, yrRE, isDon, cumHH });
+  }
+
+  const last = rows[rows.length - 1];
+  // Total capex is sum of all yearly capex (varies now since multiplier ramps)
+  const totalCap = rows.filter(r => r.isDon).reduce((s, r) => s + r.yrCap, 0);
+  return {
+    totalDon:    donYrs * annDon,
+    totalCap,
+    cumImp:      last.cumImp,
+    lastRE:      last.yrRE,
+    cumHH:       last.cumHH,
+    peopleSvd:   last.cumHH * C.HH_SIZE,
+    rows,
+  };
+}
+
+// ─── SVG Chart — zero external dependencies ────────────────────────────────
+function buildChart(rows, donYrs) {
+  const container = document.getElementById('chart-container');
+  const W   = container.getBoundingClientRect().width || 300;
+  const H   = Math.max(200, Math.round(W * 0.48));
+  const pad = { t:12, r:14, b:34, l:56 };
+  const cW  = W - pad.l - pad.r;
+  const cH  = H - pad.t - pad.b;
+  const n   = rows.length;
+
+  const allVals = rows.flatMap(r => [r.cumDon, r.cumImp]);
+  const rawMax  = Math.max(...allVals);
+
+  // Nice round ceiling for y-axis
+  function niceMax(v) {
+    if (v === 0) return 1;
+    const mag = Math.pow(10, Math.floor(Math.log10(v)));
+    return Math.ceil(v / mag) * mag;
+  }
+  const yMax   = niceMax(rawMax * 1.06);
+  const YTICKS = 5;
+
+  const xOf = i => pad.l + (n === 1 ? cW / 2 : (i / (n - 1)) * cW);
+  const yOf = v => pad.t + cH - Math.min((v / yMax) * cH, cH);
+
+  // Format for y-axis labels
+  function yLabel(v) {
+    if (v === 0) return '$0';
+    if (v >= 1000000) return '$' + (v / 1000000).toFixed(1) + 'M';
+    if (v >= 1000)    return '$' + Math.round(v / 1000) + 'k';
+    return '$' + Math.round(v);
+  }
+
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg"
+    width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"
+    style="display:block;overflow:visible">`;
+
+  // Y grid + labels
+  for (let i = 0; i <= YTICKS; i++) {
+    const v = (yMax / YTICKS) * i;
+    const y = yOf(v);
+    svg += `<line x1="${pad.l}" y1="${y}" x2="${W - pad.r}" y2="${y}"
+              stroke="${i === 0 ? '#94a3b8' : '#e2e8f0'}" stroke-width="${i === 0 ? 1.5 : 1}"/>`;
+    svg += `<text x="${pad.l - 6}" y="${y + 4}" text-anchor="end"
+              font-size="10" fill="#64748b" font-family="sans-serif">${yLabel(v)}</text>`;
+  }
+
+  // Donation-period shading
+  const shadeEnd = xOf(Math.min(donYrs - 1, n - 1));
+  svg += `<rect x="${pad.l}" y="${pad.t}" width="${shadeEnd - pad.l}" height="${cH}"
+            fill="rgba(26,86,219,0.05)" rx="3"/>`;
+
+  // Area + line builder
+  function areaPath(data, col) {
+    const pts = data.map((v, i) => `${xOf(i)},${yOf(v)}`).join(' ');
+    const x0 = xOf(0), xN = xOf(data.length - 1), y0 = yOf(0);
+    return `
+      <polygon points="${x0},${y0} ${pts} ${xN},${y0}"
+        fill="${col}" opacity="0.07"/>
+      <polyline points="${pts}"
+        fill="none" stroke="${col}" stroke-width="2.5"
+        stroke-linejoin="round" stroke-linecap="round"/>`;
+  }
+
+  svg += areaPath(rows.map(r => r.cumDon), '#1a56db');
+  svg += areaPath(rows.map(r => r.cumImp), '#0e9f6e');
+
+  // Dots
+  rows.forEach((r, i) => {
+    svg += `<circle cx="${xOf(i)}" cy="${yOf(r.cumDon)}" r="3.5"
+              fill="white" stroke="#1a56db" stroke-width="2"/>`;
+    svg += `<circle cx="${xOf(i)}" cy="${yOf(r.cumImp)}" r="3.5"
+              fill="white" stroke="#0e9f6e" stroke-width="2"/>`;
+  });
+
+  // Invisible touch/hover columns
+  const colW = n > 1 ? cW / (n - 1) : cW;
+  rows.forEach((r, i) => {
+    const x  = xOf(i);
+    const d  = encodeURIComponent(fmt(r.cumDon));
+    const im = encodeURIComponent(fmt(r.cumImp));
+    svg += `<rect
+      x="${x - colW / 2}" y="${pad.t}"
+      width="${colW}" height="${cH}"
+      fill="transparent"
+      data-yr="${r.yr}" data-don="${d}" data-imp="${im}"
+      class="tip-target"/>`;
+  });
+
+  // X labels — thin out if many points
+  const step = n <= 10 ? 1 : n <= 15 ? 2 : 5;
+  rows.forEach((r, i) => {
+    if (i % step !== 0 && i !== n - 1) return;
+    svg += `<text x="${xOf(i)}" y="${H - 4}" text-anchor="middle"
+              font-size="10" fill="#64748b" font-family="sans-serif">Yr ${r.yr}</text>`;
+  });
+
+  svg += '</svg>';
+  container.innerHTML = svg;
+
+  // Attach tooltip listeners after inserting into DOM
+  container.querySelectorAll('.tip-target').forEach(el => {
+    const show = (e) => {
+      const tip = document.getElementById('tip');
+      tip.innerHTML = `<strong>Year ${el.dataset.yr}</strong><br>
+        Donations: ${decodeURIComponent(el.dataset.don)}<br>
+        Impact: ${decodeURIComponent(el.dataset.imp)}`;
+      tip.style.display = 'block';
+      positionTip(e);
+    };
+    el.addEventListener('mouseenter', show);
+    el.addEventListener('touchstart', show, { passive: true });
+    el.addEventListener('mousemove', positionTip);
+    el.addEventListener('mouseleave', hideTip);
+    el.addEventListener('touchend', hideTip);
+  });
+}
+
+function positionTip(e) {
+  const tip = document.getElementById('tip');
+  const src = e.touches ? e.touches[0] : e;
+  const x   = src.clientX + 14;
+  const y   = src.clientY - 48;
+  tip.style.left = Math.min(x, window.innerWidth - 200) + 'px';
+  tip.style.top  = Math.max(y, 8) + 'px';
+}
+function hideTip() { document.getElementById('tip').style.display = 'none'; }
+
+// ─── Table ─────────────────────────────────────────────────────────────────
+function buildTable(rows, donYrs) {
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  rows.forEach(r => {
+    const tr   = document.createElement('tr');
+    if (r.yr === donYrs) tr.className = 'hr';
+    const col4 = r.isDon
+      ? fmt(r.yrCap)
+      : fmt(r.yrRE) + ' <small style="color:var(--muted);font-weight:400">(RE)</small>';
+    tr.innerHTML = `
+      <td>Year ${r.yr}${r.yr === donYrs ? ' ★' : ''}</td>
+      <td>${fmt(r.don)}</td>
+      <td>${fmt(r.cumDon)}</td>
+      <td>${col4}</td>
+      <td>${fmt(r.cumImp)}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function fmt(v) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency', currency: 'USD',
+    minimumFractionDigits: 0, maximumFractionDigits: 0,
+  }).format(v || 0);
+}
+
+// ─── Main ──────────────────────────────────────────────────────────────────
+function calculate() {
+  const annDon  = parseFloat(document.getElementById('donAmt').value);
+  const donYrs  = parseInt(document.getElementById('donYrs').value);
+  const projYrs = parseInt(document.getElementById('projYrs').value);
+
+  if (!annDon || annDon <= 0) { alert('Enter a donation amount greater than zero.'); return; }
+  if (donYrs > projYrs)       { alert('Donation period cannot exceed the projection window.'); return; }
+
+  const r = calcImpact(annDon, donYrs, projYrs);
+
+  document.getElementById('rDon').textContent    = fmt(r.totalDon);
+  document.getElementById('rCap').textContent    = fmt(r.totalCap);
+  document.getElementById('rImp').textContent    = fmt(r.cumImp);
+  document.getElementById('rRE').textContent     = fmt(r.lastRE);
+  document.getElementById('rPeople').textContent = Math.round(r.peopleSvd).toLocaleString('en-US');
+
+  buildTable(r.rows, donYrs);
+
+  // Show results panel so the chart container has real pixel width
+  document.getElementById('results').style.display = 'block';
+
+  // rAF ensures the browser has laid out the now-visible container
+  requestAnimationFrame(() => {
+    buildChart(r.rows, donYrs);
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
+
+window.addEventListener('load', calculate);
+</script>
+</body>
+</html>
