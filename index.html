@@ -5,459 +5,262 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Water4 · Catalytic Revenue Impact Calculator</title>
 <meta name="description" content="See how your donation unlocks debt financing, customer revenue, and retained earnings — bringing treated, piped water home permanently." />
+<meta property="og:title" content="Water4 · Catalytic Revenue Impact Calculator" />
+<meta property="og:description" content="Every dollar you give unlocks more. See exactly how your gift multiplies into lasting water access for thousands of families." />
+<meta property="og:url" content="https://calculator.water4.org" />
+<meta property="og:type" content="website" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 
 <style>
-/* ─── Design Tokens ──────────────────────────────────────── */
 :root {
   --font-display: 'Playfair Display', Georgia, serif;
-  --font-body:    'DM Sans', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --text-xs: 0.72rem; --text-sm: 0.875rem; --text-base: 1rem;
+  --text-lg: 1.2rem; --text-xl: clamp(1.6rem, 3vw, 2.2rem);
+  --text-hero: clamp(2rem, 5vw, 3.2rem);
+  --sp1:.25rem;--sp2:.5rem;--sp3:.75rem;--sp4:1rem;--sp5:1.25rem;
+  --sp6:1.5rem;--sp8:2rem;--sp10:2.5rem;--sp12:3rem;--sp16:4rem;
+  --r-sm:6px;--r-md:8px;--r-lg:12px;--r-xl:16px;--r-full:9999px;
+  --ease:180ms cubic-bezier(0.16,1,0.3,1);
 
-  --text-xs:   0.75rem;
-  --text-sm:   0.875rem;
-  --text-base: 1rem;
-  --text-lg:   1.25rem;
-  --text-xl:   clamp(1.6rem, 3vw, 2.4rem);
-
-  --space-1: 0.25rem; --space-2: 0.5rem;  --space-3: 0.75rem;
-  --space-4: 1rem;    --space-5: 1.25rem; --space-6: 1.5rem;
-  --space-8: 2rem;    --space-10: 2.5rem; --space-12: 3rem;
-  --space-16: 4rem;
-
-  --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px;
-  --radius-xl: 16px; --radius-full: 9999px;
-
-  --ease: 180ms cubic-bezier(0.16, 1, 0.3, 1);
-
-  /* Water4 brand palette — light mode */
-  --bg:           #F5F1EB;
-  --surface:      #FFFFFF;
-  --surface-2:    #F8F5F0;
-  --surface-off:  #EEE9E1;
-  --border:       rgba(10,37,64,0.13);
-  --divider:      rgba(10,37,64,0.08);
-
-  --text:         #0A2540;
-  --text-muted:   #4E6070;
-  --text-faint:   #8FA3B2;
-  --text-inv:     #FFFFFF;
-
-  --primary:      #006D8F;
-  --primary-h:    #005472;
-  --primary-hl:   #CCE5EF;
-
-  --teal:         #1D9E75;
-  --teal-h:       #0F6E56;
-  --teal-light:   #E1F5EE;
-  --teal-border:  rgba(29,158,117,0.3);
-
-  --accent:       #00B0C8;
-  --accent-light: #E0F7FB;
-
-  --gold:         #C47F00;
-  --gold-light:   #FEF3D0;
-
-  --success:      #2A7D4F;
-  --success-light:#D4EDDF;
-
-  --shadow-sm: 0 1px 3px rgba(10,37,64,0.07);
-  --shadow-md: 0 4px 16px rgba(10,37,64,0.10);
+  --bg:#F5F1EB; --surface:#FFF; --surface-2:#F8F5F0; --surface-off:#EEE9E1;
+  --border:rgba(10,37,64,.12); --divider:rgba(10,37,64,.07);
+  --text:#0A2540; --text-muted:#4E6070; --text-faint:#8FA3B2; --text-inv:#FFF;
+  --primary:#006D8F; --primary-h:#005472; --primary-hl:#CCE5EF;
+  --teal:#1D9E75; --teal-h:#0F6E56; --teal-light:#E1F5EE; --teal-border:rgba(29,158,117,.28);
+  --accent:#00B0C8; --accent-light:#E0F7FB;
+  --gold:#C47F00; --gold-light:#FEF3D0;
+  --success:#2A7D4F; --success-light:#D4EDDF;
+  --shadow-sm:0 1px 3px rgba(10,37,64,.07); --shadow-md:0 4px 16px rgba(10,37,64,.10);
+  --shadow-lg:0 12px 40px rgba(10,37,64,.14);
 }
-
 [data-theme="dark"] {
-  --bg:           #0B1720;
-  --surface:      #111F2C;
-  --surface-2:    #162533;
-  --surface-off:  #0F1D28;
-  --border:       rgba(255,255,255,0.1);
-  --divider:      rgba(255,255,255,0.06);
+  --bg:#0B1720; --surface:#111F2C; --surface-2:#162533; --surface-off:#0F1D28;
+  --border:rgba(255,255,255,.10); --divider:rgba(255,255,255,.06);
+  --text:#D4E5F0; --text-muted:#7BA0B8; --text-faint:#3D5F75; --text-inv:#0B1720;
+  --primary:#38A8CC; --primary-h:#4FBDD9; --primary-hl:#1A3D52;
+  --teal:#5DCAA5; --teal-h:#9FE1CB; --teal-light:rgba(29,158,117,.15); --teal-border:rgba(93,202,165,.28);
+  --accent:#00C4DD; --accent-light:#0D2D36;
+  --gold:#F0A429; --gold-light:#2B1E06;
+  --success:#4DB87A; --success-light:#0D2B1A;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.3); --shadow-md:0 4px 16px rgba(0,0,0,.35);
+  --shadow-lg:0 12px 40px rgba(0,0,0,.4);
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme]){
+  --bg:#0B1720;--surface:#111F2C;--surface-2:#162533;--surface-off:#0F1D28;
+  --border:rgba(255,255,255,.10);--divider:rgba(255,255,255,.06);
+  --text:#D4E5F0;--text-muted:#7BA0B8;--text-faint:#3D5F75;--text-inv:#0B1720;
+  --primary:#38A8CC;--primary-h:#4FBDD9;--primary-hl:#1A3D52;
+  --teal:#5DCAA5;--teal-h:#9FE1CB;--teal-light:rgba(29,158,117,.15);--teal-border:rgba(93,202,165,.28);
+  --accent:#00C4DD;--accent-light:#0D2D36;
+  --gold:#F0A429;--gold-light:#2B1E06;
+  --success:#4DB87A;--success-light:#0D2B1A;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.3);--shadow-md:0 4px 16px rgba(0,0,0,.35);
+}}
 
-  --text:         #D4E5F0;
-  --text-muted:   #7BA0B8;
-  --text-faint:   #3D5F75;
-  --text-inv:     #0B1720;
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{font-family:var(--font-body);font-size:var(--text-base);color:var(--text);background:var(--bg);line-height:1.6;min-height:100dvh}
+img,svg{display:block;max-width:100%}
+input,button,select{font:inherit;color:inherit;cursor:pointer}
+button{background:none;border:none}
+a,button,[role="button"],input,select{transition:color var(--ease),background var(--ease),border-color var(--ease),box-shadow var(--ease),opacity var(--ease)}
+:focus-visible{outline:2px solid var(--primary);outline-offset:3px;border-radius:var(--r-sm)}
 
-  --primary:      #38A8CC;
-  --primary-h:    #4FBDD9;
-  --primary-hl:   #1A3D52;
+.page-wrapper{min-height:100dvh;display:flex;flex-direction:column}
 
-  --teal:         #5DCAA5;
-  --teal-h:       #9FE1CB;
-  --teal-light:   rgba(29,158,117,0.15);
-  --teal-border:  rgba(93,202,165,0.3);
+.header{background:var(--surface);border-bottom:.5px solid var(--border);padding:var(--sp4) var(--sp8);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20;box-shadow:var(--shadow-sm)}
+.header-logo{display:flex;align-items:center;gap:var(--sp3);text-decoration:none;color:var(--text)}
+.logo-mark{width:34px;height:34px;flex-shrink:0}
+.logo-text{font-family:var(--font-display);font-weight:500;font-size:1.05rem;line-height:1.1}
+.logo-sub{font-size:var(--text-xs);color:var(--text-muted);letter-spacing:.05em}
+.header-right{display:flex;align-items:center;gap:var(--sp3)}
+.header-cta{background:var(--teal);color:#fff;border:none;border-radius:var(--r-md);padding:8px 16px;font-size:var(--text-sm);font-weight:500;text-decoration:none;display:inline-block}
+.header-cta:hover{background:var(--teal-h)}
+.theme-toggle{width:34px;height:34px;border-radius:var(--r-full);display:flex;align-items:center;justify-content:center;color:var(--text-muted);background:var(--surface-off);border:.5px solid var(--border)}
+.theme-toggle:hover{color:var(--primary);background:var(--primary-hl);border-color:var(--primary)}
 
-  --accent:       #00C4DD;
-  --accent-light: #0D2D36;
+.hero{background:linear-gradient(135deg,#006D8F 0%,#004a6e 55%,#002D45 100%);color:#fff;padding:var(--sp12) var(--sp8);text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;pointer-events:none;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='28' fill='none' stroke='white' stroke-width='0.4' opacity='0.06'/%3E%3C/svg%3E") repeat}
+.hero-content{position:relative;max-width:720px;margin:0 auto}
+.hero-eyebrow{font-size:var(--text-xs);font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:var(--sp3);display:flex;align-items:center;justify-content:center;gap:8px}
+.hero-eyebrow::before,.hero-eyebrow::after{content:'';display:inline-block;width:24px;height:1px;background:rgba(255,255,255,.35);border-radius:2px}
+.hero-title{font-family:var(--font-display);font-weight:500;font-size:var(--text-xl);line-height:1.15;color:#fff;margin-bottom:var(--sp4)}
+.hero-desc{font-size:var(--text-base);color:rgba(255,255,255,.7);max-width:520px;margin:0 auto;line-height:1.7}
+.hero-stats{display:flex;justify-content:center;gap:var(--sp8);margin-top:var(--sp8);flex-wrap:wrap}
+.hero-stat{text-align:center}
+.hero-stat-val{font-family:var(--font-display);font-size:1.5rem;font-weight:500;color:#fff;line-height:1}
+.hero-stat-lbl{font-size:var(--text-xs);color:rgba(255,255,255,.5);margin-top:4px}
 
-  --gold:         #F0A429;
-  --gold-light:   #2B1E06;
+.main{flex:1;max-width:1100px;margin:0 auto;width:100%;padding:var(--sp10) var(--sp8) var(--sp16);display:flex;flex-direction:column;gap:var(--sp10)}
 
-  --success:      #4DB87A;
-  --success-light:#0D2B1A;
+.card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r-xl);padding:var(--sp8);box-shadow:var(--shadow-sm)}
+.section-header{display:flex;align-items:center;gap:var(--sp3);margin-bottom:var(--sp6)}
+.section-number{width:26px;height:26px;border-radius:var(--r-full);background:var(--teal);color:#fff;font-size:var(--text-xs);font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.section-title{font-family:var(--font-display);font-weight:400;font-size:var(--text-sm);letter-spacing:.04em;color:var(--text-muted);text-transform:uppercase}
 
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.35);
-}
+.people-hero{text-align:center;padding:var(--sp8) var(--sp8) var(--sp6);border-bottom:.5px solid var(--divider);margin-bottom:var(--sp8)}
+.people-count{font-family:var(--font-display);font-size:var(--text-hero);font-weight:500;color:var(--teal);line-height:1;margin-bottom:var(--sp2);transition:all .3s ease}
+.people-label{font-size:var(--text-base);color:var(--text-muted)}
+.people-sub{font-size:var(--text-sm);color:var(--text-faint);margin-top:4px}
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) {
-    --bg:#0B1720; --surface:#111F2C; --surface-2:#162533; --surface-off:#0F1D28;
-    --border:rgba(255,255,255,0.1); --divider:rgba(255,255,255,0.06);
-    --text:#D4E5F0; --text-muted:#7BA0B8; --text-faint:#3D5F75; --text-inv:#0B1720;
-    --primary:#38A8CC; --primary-h:#4FBDD9; --primary-hl:#1A3D52;
-    --teal:#5DCAA5; --teal-h:#9FE1CB; --teal-light:rgba(29,158,117,0.15); --teal-border:rgba(93,202,165,0.3);
-    --accent:#00C4DD; --accent-light:#0D2D36;
-    --gold:#F0A429; --gold-light:#2B1E06;
-    --success:#4DB87A; --success-light:#0D2B1A;
-    --shadow-sm:0 1px 3px rgba(0,0,0,0.3); --shadow-md:0 4px 16px rgba(0,0,0,0.35);
-  }
-}
+.tier-label{font-size:var(--text-xs);font-weight:500;color:var(--text-muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:var(--sp3)}
+.tier-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;margin-bottom:var(--sp6)}
+.tier-btn{background:var(--surface-2);border:.5px solid var(--border);border-radius:var(--r-lg);padding:var(--sp3) var(--sp2);text-align:center;cursor:pointer;transition:all var(--ease);position:relative}
+.tier-btn:hover{border-color:var(--teal);background:var(--teal-light)}
+.tier-btn.active{background:var(--teal-light);border-color:var(--teal);border-width:1.5px}
+.tier-btn.active .tier-amt{color:var(--teal)}
+.tier-amt{font-family:var(--font-display);font-size:.95rem;font-weight:500;color:var(--text);line-height:1.1}
+.tier-desc{font-size:var(--text-xs);color:var(--text-muted);margin-top:3px;line-height:1.3}
+.tier-badge{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--teal);color:#fff;font-size:10px;font-weight:500;padding:2px 8px;border-radius:var(--r-full);white-space:nowrap;letter-spacing:.03em}
 
-/* ─── Reset ──────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
-body {
-  font-family: var(--font-body);
-  font-size: var(--text-base);
-  color: var(--text);
-  background: var(--bg);
-  line-height: 1.6;
-  min-height: 100dvh;
-}
-img, svg { display: block; max-width: 100%; }
-input, button, select { font: inherit; color: inherit; cursor: pointer; }
-button { background: none; border: none; }
-a, button, [role="button"], input, select {
-  transition: color var(--ease), background var(--ease),
-              border-color var(--ease), box-shadow var(--ease), opacity var(--ease);
-}
-:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; border-radius: var(--radius-sm); }
+.inputs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--sp6);margin-bottom:var(--sp4)}
+.field-group{display:flex;flex-direction:column;gap:var(--sp2)}
+.field-label{font-size:var(--text-sm);font-weight:500;color:var(--text-muted)}
+.field-input,.field-select{width:100%;padding:var(--sp3) var(--sp4);background:var(--surface-2);border:.5px solid var(--border);border-radius:var(--r-md);font-size:var(--text-base);color:var(--text);appearance:none;-webkit-appearance:none}
+.field-input:focus,.field-select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-light)}
+.field-input:hover,.field-select:hover{border-color:var(--teal)}
+.select-wrapper{position:relative}
+.select-wrapper::after{content:'';position:absolute;right:14px;top:50%;transform:translateY(-50%);pointer-events:none;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--text-muted)}
 
-/* ─── Page wrapper ───────────────────────────────────────── */
-.page-wrapper { min-height: 100dvh; display: flex; flex-direction: column; }
+.equation-row{display:flex;flex-wrap:wrap;gap:var(--sp2);align-items:stretch}
+.eq-block{flex:1;min-width:130px;background:var(--surface-2);border:.5px solid var(--border);border-radius:var(--r-lg);padding:var(--sp5);display:flex;flex-direction:column;gap:4px}
+.eq-block.hi-primary{background:var(--primary-hl);border-color:var(--primary)}
+.eq-block.hi-teal{background:var(--teal-light);border-color:var(--teal)}
+.eq-block.hi-gold{background:var(--gold-light);border-color:var(--gold)}
+.eq-block.hi-accent{background:var(--accent-light);border-color:var(--accent)}
+.eq-label{font-size:var(--text-xs);font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted);line-height:1.3}
+.eq-value{font-family:var(--font-display);font-weight:500;font-size:var(--text-lg);color:var(--text);line-height:1.1}
+.eq-block.hi-primary .eq-value{color:var(--primary)}
+.eq-block.hi-teal .eq-value{color:var(--teal)}
+.eq-block.hi-gold .eq-value{color:var(--gold)}
+.eq-block.hi-accent .eq-value{color:var(--accent)}
+.eq-sub{font-size:var(--text-xs);color:var(--text-muted)}
+.eq-operator{display:flex;align-items:center;justify-content:center;font-size:1.25rem;font-weight:300;color:var(--text-muted);flex-shrink:0;padding:0 2px;align-self:center}
 
-/* ─── Header ─────────────────────────────────────────────── */
-.header {
-  background: var(--surface);
-  border-bottom: 0.5px solid var(--border);
-  padding: var(--space-4) var(--space-8);
-  display: flex; align-items: center; justify-content: space-between;
-  position: sticky; top: 0; z-index: 20;
-  box-shadow: var(--shadow-sm);
-}
-.header-logo {
-  display: flex; align-items: center; gap: var(--space-3);
-  text-decoration: none; color: var(--text);
-}
-.logo-mark { width: 34px; height: 34px; flex-shrink: 0; }
-.logo-text {
-  font-family: var(--font-display); font-weight: 500; font-size: 1.1rem;
-  color: var(--text); line-height: 1.1;
-}
-.logo-sub {
-  font-size: var(--text-xs); color: var(--text-muted);
-  font-weight: 400; letter-spacing: 0.05em;
-}
-.header-right { display: flex; align-items: center; gap: var(--space-3); }
-.header-cta {
-  background: var(--teal); color: #fff; border: none;
-  border-radius: var(--radius-md); padding: 8px 16px;
-  font-size: var(--text-sm); font-weight: 500;
-  text-decoration: none; display: inline-block;
-}
-.header-cta:hover { background: var(--teal-h); }
-.theme-toggle {
-  width: 34px; height: 34px; border-radius: var(--radius-full);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--text-muted); background: var(--surface-off); border: 0.5px solid var(--border);
-}
-.theme-toggle:hover { color: var(--primary); background: var(--primary-hl); border-color: var(--primary); }
+.impact-callout{background:linear-gradient(135deg,#006D8F 0%,#004a6e 100%);border-radius:var(--r-xl);padding:var(--sp8);display:flex;align-items:center;justify-content:space-between;gap:var(--sp6);flex-wrap:wrap;color:#fff}
+.callout-left{flex:1;min-width:180px}
+.callout-eyebrow{font-size:var(--text-xs);font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:var(--sp2)}
+.callout-value{font-family:var(--font-display);font-weight:500;font-size:var(--text-xl);color:#fff;line-height:1.05}
+.callout-desc{font-size:var(--text-sm);color:rgba(255,255,255,.6);margin-top:var(--sp2)}
+.callout-right{display:flex;flex-direction:column;align-items:flex-end;gap:var(--sp3);flex-shrink:0}
+.callout-people-value{font-family:var(--font-display);font-weight:500;font-size:var(--text-lg);color:#fff;line-height:1.1;text-align:right}
+.callout-people-sub{font-size:var(--text-xs);color:rgba(255,255,255,.55);margin-top:4px;line-height:1.4;text-align:right}
+.multiplier-badge{background:rgba(255,255,255,.15);border:.5px solid rgba(255,255,255,.28);border-radius:var(--r-full);padding:var(--sp2) var(--sp4);font-size:var(--text-xs);font-weight:500;color:#fff;letter-spacing:.04em;white-space:nowrap}
 
-/* ─── Hero ───────────────────────────────────────────────── */
-.hero {
-  background: linear-gradient(135deg, #006D8F 0%, #004a6e 55%, #002D45 100%);
-  color: #fff; padding: var(--space-12) var(--space-8);
-  text-align: center; position: relative; overflow: hidden;
-}
-.hero::before {
-  content: ''; position: absolute; inset: 0; pointer-events: none;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='28' fill='none' stroke='white' stroke-width='0.4' opacity='0.06'/%3E%3C/svg%3E") repeat;
-}
-.hero-content { position: relative; max-width: 680px; margin: 0 auto; }
-.hero-eyebrow {
-  font-size: var(--text-xs); font-weight: 500; letter-spacing: 0.12em;
-  text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: var(--space-3);
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-}
-.hero-eyebrow::before, .hero-eyebrow::after {
-  content: ''; display: inline-block; width: 24px; height: 1px;
-  background: rgba(255,255,255,0.4); border-radius: 2px;
-}
-.hero-title {
-  font-family: var(--font-display); font-weight: 500;
-  font-size: var(--text-xl); line-height: 1.15; color: #fff;
-  margin-bottom: var(--space-4);
-}
-.hero-desc {
-  font-size: var(--text-base); color: rgba(255,255,255,0.72);
-  max-width: 520px; margin: 0 auto; line-height: 1.7;
-}
-.hero-stats {
-  display: flex; justify-content: center; gap: var(--space-8);
-  margin-top: var(--space-8); flex-wrap: wrap;
-}
-.hero-stat { text-align: center; }
-.hero-stat-val {
-  font-family: var(--font-display); font-size: 1.6rem; font-weight: 500;
-  color: #fff; line-height: 1;
-}
-.hero-stat-lbl { font-size: var(--text-xs); color: rgba(255,255,255,0.55); margin-top: 4px; }
+.named-gift{display:none;background:var(--teal-light);border:.5px solid var(--teal-border);border-radius:var(--r-lg);padding:var(--sp4) var(--sp5);margin-top:var(--sp4);align-items:center;gap:var(--sp3)}
+.named-gift.visible{display:flex}
+.named-gift-icon{font-size:20px;flex-shrink:0}
+.named-gift-text{font-size:var(--text-sm);color:var(--text);line-height:1.5}
+.named-gift-text strong{color:var(--teal)}
 
-/* ─── Main ───────────────────────────────────────────────── */
-.main {
-  flex: 1; max-width: 1100px; margin: 0 auto; width: 100%;
-  padding: var(--space-10) var(--space-8) var(--space-16);
-  display: flex; flex-direction: column; gap: var(--space-10);
-}
+.compare-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp6);flex-wrap:wrap;gap:var(--sp3)}
+.compare-toggle{display:flex;align-items:center;gap:var(--sp2);font-size:var(--text-sm);color:var(--text-muted);cursor:pointer;user-select:none}
+.toggle-switch{width:36px;height:20px;background:var(--border);border-radius:var(--r-full);position:relative;transition:background var(--ease);flex-shrink:0}
+.toggle-switch::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:var(--r-full);top:3px;left:3px;transition:transform var(--ease);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle-switch.on{background:var(--teal)}
+.toggle-switch.on::after{transform:translateX(16px)}
+.compare-panels{display:grid;grid-template-columns:1fr;gap:var(--sp6)}
+.compare-panels.two-up{grid-template-columns:1fr 1fr}
+.compare-panel{background:var(--surface-2);border:.5px solid var(--border);border-radius:var(--r-lg);padding:var(--sp5)}
+.compare-panel-label{font-size:var(--text-xs);font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);margin-bottom:var(--sp4)}
+.compare-inputs{display:flex;flex-direction:column;gap:var(--sp3)}
+.compare-result{margin-top:var(--sp4);padding-top:var(--sp4);border-top:.5px solid var(--divider)}
+.compare-result-row{display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp2);margin-bottom:var(--sp2)}
+.compare-result-lbl{font-size:var(--text-xs);color:var(--text-muted)}
+.compare-result-val{font-family:var(--font-display);font-weight:500;font-size:.95rem;color:var(--text)}
+.compare-result-val.better{color:var(--teal)}
 
-/* ─── Card ───────────────────────────────────────────────── */
-.card {
-  background: var(--surface); border: 0.5px solid var(--border);
-  border-radius: var(--radius-xl); padding: var(--space-8);
-  box-shadow: var(--shadow-sm);
-}
-.section-header {
-  display: flex; align-items: center; gap: var(--space-3);
-  margin-bottom: var(--space-6);
-}
-.section-number {
-  width: 26px; height: 26px; border-radius: var(--radius-full);
-  background: var(--teal); color: #fff;
-  font-size: var(--text-xs); font-weight: 500;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-}
-.section-title {
-  font-family: var(--font-display); font-weight: 400; font-size: 1rem;
-  letter-spacing: 0.04em; color: var(--text-muted);
-  text-transform: uppercase; font-size: var(--text-sm);
-}
+.chart-container{position:relative;height:300px;width:100%}
+.legend-row{display:flex;flex-wrap:wrap;gap:var(--sp4);margin-bottom:var(--sp4)}
+.legend-item{display:flex;align-items:center;gap:var(--sp2);font-size:var(--text-xs);color:var(--text-muted)}
+.legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
 
-/* ─── Input form ─────────────────────────────────────────── */
-.inputs-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-6); margin-bottom: var(--space-8);
-}
-.field-group { display: flex; flex-direction: column; gap: var(--space-2); }
-.field-label { font-size: var(--text-sm); font-weight: 500; color: var(--text-muted); }
-.field-input, .field-select {
-  width: 100%; padding: var(--space-3) var(--space-4);
-  background: var(--surface-2); border: 0.5px solid var(--border);
-  border-radius: var(--radius-md); font-size: var(--text-base);
-  color: var(--text); font-weight: 400;
-  appearance: none; -webkit-appearance: none;
-}
-.field-input:focus, .field-select:focus {
-  outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-light);
-}
-.field-input:hover, .field-select:hover { border-color: var(--teal); }
-.select-wrapper { position: relative; }
-.select-wrapper::after {
-  content: ''; position: absolute; right: 14px; top: 50%;
-  transform: translateY(-50%); pointer-events: none;
-  border-left: 5px solid transparent; border-right: 5px solid transparent;
-  border-top: 6px solid var(--text-muted);
-}
-.calc-btn {
-  width: 100%; padding: var(--space-4) var(--space-8);
-  background: var(--teal); color: #fff; border-radius: var(--radius-md);
-  font-family: var(--font-body); font-weight: 500; font-size: var(--text-base);
-  display: flex; align-items: center; justify-content: center; gap: var(--space-2);
-  box-shadow: 0 2px 8px rgba(29,158,117,0.28); letter-spacing: 0.01em;
-}
-.calc-btn:hover { background: var(--teal-h); box-shadow: 0 4px 16px rgba(29,158,117,0.35); transform: translateY(-1px); }
-.calc-btn:active { transform: translateY(0); }
+.table-toggle{display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;margin-bottom:0}
+.table-chevron{transition:transform var(--ease);color:var(--text-faint)}
+.table-chevron.open{transform:rotate(180deg)}
+.table-content{overflow:hidden;max-height:0;transition:max-height .4s cubic-bezier(0.4,0,0.2,1)}
+.table-content.open{max-height:2000px}
+.table-wrapper{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r-lg);border:.5px solid var(--border);margin-top:var(--sp5)}
+table{border-collapse:collapse;width:100%;font-size:var(--text-sm)}
+thead tr{background:var(--surface-off)}
+thead th{padding:var(--sp3) var(--sp4);text-align:right;font-weight:500;font-size:var(--text-xs);letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted);white-space:nowrap;border-bottom:.5px solid var(--border)}
+thead th:first-child{text-align:left}
+tbody tr{border-bottom:.5px solid var(--divider);transition:background var(--ease)}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--surface-2)}
+tbody tr.donation-active{background:rgba(29,158,117,.06)}
+tbody td{padding:var(--sp3) var(--sp4);text-align:right;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody td:first-child{text-align:left;color:var(--text-muted);font-weight:500}
+tbody td.positive{color:var(--teal);font-weight:500}
+tbody td.highlight{color:var(--primary);font-weight:500}
+tfoot tr{background:var(--surface-off);border-top:.5px solid var(--border)}
+tfoot td{padding:var(--sp3) var(--sp4);text-align:right;font-weight:500;color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
+tfoot td:first-child{text-align:left}
 
-/* ─── Equation row ───────────────────────────────────────── */
-.equation-row {
-  display: flex; flex-wrap: wrap; gap: var(--space-2);
-  align-items: stretch;
-}
-.eq-block {
-  flex: 1; min-width: 130px;
-  background: var(--surface-2); border: 0.5px solid var(--border);
-  border-radius: var(--radius-lg); padding: var(--space-5);
-  display: flex; flex-direction: column; gap: 4px;
-}
-.eq-block.hi-primary  { background: var(--primary-hl); border-color: var(--primary); }
-.eq-block.hi-teal     { background: var(--teal-light); border-color: var(--teal); }
-.eq-block.hi-gold     { background: var(--gold-light); border-color: var(--gold); }
-.eq-block.hi-accent   { background: var(--accent-light); border-color: var(--accent); }
+.has-tip{border-bottom:1px dashed var(--text-faint);cursor:help;position:relative}
+.has-tip:hover::after{content:attr(data-tip);position:absolute;bottom:120%;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);font-size:var(--text-xs);padding:var(--sp2) var(--sp3);border-radius:var(--r-md);white-space:pre-wrap;max-width:240px;text-align:center;pointer-events:none;z-index:100;box-shadow:var(--shadow-md)}
 
-.eq-label {
-  font-size: var(--text-xs); font-weight: 500; letter-spacing: 0.04em;
-  text-transform: uppercase; color: var(--text-muted); line-height: 1.3;
-}
-.eq-value {
-  font-family: var(--font-display); font-weight: 500;
-  font-size: var(--text-lg); color: var(--text); line-height: 1.1;
-}
-.eq-block.hi-primary .eq-value { color: var(--primary); }
-.eq-block.hi-teal    .eq-value { color: var(--teal); }
-.eq-block.hi-gold    .eq-value { color: var(--gold); }
-.eq-block.hi-accent  .eq-value { color: var(--accent); }
-.eq-sub { font-size: var(--text-xs); color: var(--text-muted); }
+.story-card{background:var(--teal-light);border:.5px solid var(--teal-border);border-left:3px solid var(--teal);border-radius:0 var(--r-lg) var(--r-lg) 0;padding:var(--sp5) var(--sp6)}
+.story-quote{font-family:var(--font-display);font-style:italic;font-size:.95rem;color:var(--text);line-height:1.65;margin-bottom:var(--sp2)}
+.story-attr{font-size:var(--text-xs);color:var(--text-muted)}
 
-.eq-operator {
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.25rem; font-weight: 300; color: var(--text-muted);
-  flex-shrink: 0; padding: 0 2px; align-self: center;
+.action-row{display:flex;gap:10px;flex-wrap:wrap}
+.action-btn{flex:1;min-width:140px;padding:13px 20px;border-radius:var(--r-md);font-size:var(--text-sm);font-weight:500;text-align:center;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;border:none}
+.action-btn.primary{background:var(--teal);color:#fff}
+.action-btn.primary:hover{background:var(--teal-h)}
+.action-btn.secondary{background:transparent;color:var(--text);border:.5px solid var(--border)}
+.action-btn.secondary:hover{border-color:var(--teal);color:var(--teal)}
+.action-btn.talk{background:var(--primary-hl);color:var(--primary);border:.5px solid var(--primary-hl)}
+.action-btn.talk:hover{background:var(--primary);color:#fff}
+
+@media print{
+  .header,.hero,.tier-grid,.field-group,.action-row,.compare-bar,
+  .theme-toggle,.header-cta,.story-card,.footer{display:none!important}
+  .card{box-shadow:none;border:.5px solid #ccc;break-inside:avoid}
+  .people-hero .people-count{color:#1D9E75}
+  body{background:#fff;color:#000}
 }
 
-/* ─── Callout banner ─────────────────────────────────────── */
-.impact-callout {
-  background: linear-gradient(135deg, #006D8F 0%, #004a6e 100%);
-  border-radius: var(--radius-xl); padding: var(--space-8);
-  display: flex; align-items: center; justify-content: space-between;
-  gap: var(--space-6); flex-wrap: wrap; color: #fff;
-}
-.callout-left { flex: 1; min-width: 180px; }
-.callout-eyebrow {
-  font-size: var(--text-xs); font-weight: 500; letter-spacing: 0.1em;
-  text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: var(--space-2);
-}
-.callout-value {
-  font-family: var(--font-display); font-weight: 500;
-  font-size: var(--text-xl); color: #fff; line-height: 1.05;
-}
-.callout-desc { font-size: var(--text-sm); color: rgba(255,255,255,0.65); margin-top: var(--space-2); }
-.callout-right {
-  display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-3); flex-shrink: 0;
-}
-.callout-people-value {
-  font-family: var(--font-display); font-weight: 500;
-  font-size: var(--text-lg); color: #fff; line-height: 1.1; text-align: right;
-}
-.callout-people-sub {
-  font-size: var(--text-xs); color: rgba(255,255,255,0.6); margin-top: 4px;
-  line-height: 1.4; text-align: right;
-}
-.multiplier-badge {
-  background: rgba(255,255,255,0.15); border: 0.5px solid rgba(255,255,255,0.3);
-  border-radius: var(--radius-full); padding: var(--space-2) var(--space-4);
-  font-size: var(--text-xs); font-weight: 500; color: #fff;
-  letter-spacing: 0.04em; white-space: nowrap;
-}
+@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.count-anim{animation:countUp .4s ease both}
 
-/* ─── Chart ──────────────────────────────────────────────── */
-.chart-container { position: relative; height: 300px; width: 100%; }
-.legend-row { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-bottom: var(--space-4); }
-.legend-item {
-  display: flex; align-items: center; gap: var(--space-2);
-  font-size: var(--text-xs); color: var(--text-muted);
-}
-.legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+.result-area{display:none}
+.result-area.visible{display:flex;flex-direction:column;gap:var(--sp10)}
+.empty-state{text-align:center;padding:var(--sp12) var(--sp8);color:var(--text-muted)}
+.empty-text{font-size:var(--text-base);font-weight:500}
+.empty-sub{font-size:var(--text-sm);color:var(--text-faint);margin-top:var(--sp2)}
 
-/* ─── Table ──────────────────────────────────────────────── */
-.table-wrapper {
-  overflow-x: auto; -webkit-overflow-scrolling: touch;
-  border-radius: var(--radius-lg); border: 0.5px solid var(--border);
-}
-table { border-collapse: collapse; width: 100%; font-size: var(--text-sm); }
-thead tr { background: var(--surface-off); }
-thead th {
-  padding: var(--space-3) var(--space-4); text-align: right;
-  font-weight: 500; font-size: var(--text-xs); letter-spacing: 0.05em;
-  text-transform: uppercase; color: var(--text-muted); white-space: nowrap;
-  border-bottom: 0.5px solid var(--border);
-}
-thead th:first-child { text-align: left; }
-tbody tr { border-bottom: 0.5px solid var(--divider); transition: background var(--ease); }
-tbody tr:last-child { border-bottom: none; }
-tbody tr:hover { background: var(--surface-2); }
-tbody tr.donation-active { background: rgba(29,158,117,0.06); }
-tbody td {
-  padding: var(--space-3) var(--space-4); text-align: right;
-  color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap;
-}
-tbody td:first-child { text-align: left; color: var(--text-muted); font-weight: 500; }
-tbody td.positive { color: var(--teal); font-weight: 500; }
-tbody td.highlight { color: var(--primary); font-weight: 500; }
-tfoot tr { background: var(--surface-off); border-top: 0.5px solid var(--border); }
-tfoot td {
-  padding: var(--space-3) var(--space-4); text-align: right;
-  font-weight: 500; color: var(--text);
-  font-variant-numeric: tabular-nums; white-space: nowrap;
-}
-tfoot td:first-child { text-align: left; }
+.footer{background:var(--surface);border-top:.5px solid var(--border);padding:var(--sp6) var(--sp8);text-align:center;font-size:var(--text-xs);color:var(--text-faint);line-height:1.7}
+.footer a{color:var(--teal);text-decoration:none}
 
-/* ─── Tooltip ────────────────────────────────────────────── */
-.has-tip {
-  border-bottom: 1px dashed var(--text-faint); cursor: help; position: relative;
+@media(max-width:700px){
+  .header{padding:var(--sp3) var(--sp4)}
+  .header-cta{display:none}
+  .hero{padding:var(--sp8) var(--sp5)}
+  .main{padding:var(--sp8) var(--sp4) var(--sp12);gap:var(--sp8)}
+  .card{padding:var(--sp6) var(--sp4)}
+  .equation-row{flex-direction:column}
+  .impact-callout{flex-direction:column}
+  .callout-right{align-items:flex-start}
+  .compare-panels.two-up{grid-template-columns:1fr}
+  .tier-grid{grid-template-columns:repeat(3,1fr)}
+  .action-row{flex-direction:column}
 }
-.has-tip:hover::after {
-  content: attr(data-tip); position: absolute; bottom: 120%; left: 50%;
-  transform: translateX(-50%); background: var(--text); color: var(--bg);
-  font-size: var(--text-xs); padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md); white-space: pre-wrap; max-width: 240px;
-  text-align: center; pointer-events: none; z-index: 100; box-shadow: var(--shadow-md);
-}
-
-/* ─── Empty state ────────────────────────────────────────── */
-.result-area { display: none; }
-.result-area.visible { display: flex; flex-direction: column; gap: var(--space-10); }
-.empty-state { text-align: center; padding: var(--space-12) var(--space-8); color: var(--text-muted); }
-.empty-text { font-size: var(--text-base); font-weight: 500; }
-.empty-sub { font-size: var(--text-sm); color: var(--text-faint); margin-top: var(--space-2); }
-
-/* ─── Story callout ──────────────────────────────────────── */
-.story-card {
-  background: var(--teal-light); border: 0.5px solid var(--teal-border);
-  border-left: 3px solid var(--teal); border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
-  padding: var(--space-5) var(--space-6);
-}
-.story-quote {
-  font-family: var(--font-display); font-style: italic; font-size: 0.95rem;
-  color: var(--text); line-height: 1.65; margin-bottom: var(--space-2);
-}
-.story-attr { font-size: var(--text-xs); color: var(--text-muted); }
-
-/* ─── Footer ─────────────────────────────────────────────── */
-.footer {
-  background: var(--surface); border-top: 0.5px solid var(--border);
-  padding: var(--space-6) var(--space-8); text-align: center;
-  font-size: var(--text-xs); color: var(--text-faint); line-height: 1.7;
-}
-.footer a { color: var(--teal); text-decoration: none; }
-
-/* ─── Responsive ─────────────────────────────────────────── */
-@media (max-width: 700px) {
-  .header { padding: var(--space-3) var(--space-4); }
-  .header-cta { display: none; }
-  .hero { padding: var(--space-8) var(--space-5); }
-  .hero-stats { gap: var(--space-5); }
-  .main { padding: var(--space-8) var(--space-4) var(--space-12); gap: var(--space-8); }
-  .card { padding: var(--space-6) var(--space-4); }
-  .equation-row { flex-direction: column; }
-  .impact-callout { flex-direction: column; }
-  .callout-right { align-items: flex-start; }
-}
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
 <body>
 <div class="page-wrapper">
 
-<!-- ─── Header ──────────────────────────────────────────── -->
 <header class="header">
-  <a href="https://water4.org" class="header-logo" target="_blank" aria-label="Water4 Home">
+  <a href="https://water4.org" class="header-logo" target="_blank">
     <svg class="logo-mark" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M18 4C18 4 6 15.5 6 22.5C6 29.4 11.4 34 18 34C24.6 34 30 29.4 30 22.5C30 15.5 18 4 18 4Z" fill="var(--teal)" opacity="0.18"/>
       <path d="M18 7C18 7 8 17.2 8 23.2C8 28.6 12.5 33 18 33C23.5 33 28 28.6 28 23.2C28 17.2 18 7 18 7Z" fill="var(--teal)"/>
-      <text x="18" y="26.5" text-anchor="middle" font-family="DM Sans, sans-serif" font-weight="500" font-size="13" fill="white">4</text>
+      <text x="18" y="26.5" text-anchor="middle" font-family="DM Sans,sans-serif" font-weight="500" font-size="13" fill="white">4</text>
     </svg>
     <div>
       <div class="logo-text">Water4</div>
@@ -475,57 +278,62 @@ tfoot td:first-child { text-align: left; }
   </div>
 </header>
 
-<!-- ─── Hero ─────────────────────────────────────────────── -->
 <section class="hero">
   <div class="hero-content">
     <p class="hero-eyebrow">Water Infrastructure Financing</p>
     <h1 class="hero-title">Catalytic Revenue<br>Impact Calculator</h1>
-    <p class="hero-desc">See exactly how your grant unlocks debt financing, customer revenue, and retained earnings — bringing treated, piped water home, permanently.</p>
+    <p class="hero-desc">Every dollar you give unlocks more. See exactly how your gift multiplies into lasting water access for thousands of families.</p>
     <div class="hero-stats">
-      <div class="hero-stat">
-        <div class="hero-stat-val">$425</div>
-        <div class="hero-stat-lbl">per household connection</div>
-      </div>
-      <div class="hero-stat">
-        <div class="hero-stat-val">9.7</div>
-        <div class="hero-stat-lbl">people per household</div>
-      </div>
-      <div class="hero-stat">
-        <div class="hero-stat-val">99%</div>
-        <div class="hero-stat-lbl">system uptime</div>
-      </div>
-      <div class="hero-stat">
-        <div class="hero-stat-val">80%+</div>
-        <div class="hero-stat-lbl">self-sustaining by 2031</div>
-      </div>
+      <div class="hero-stat"><div class="hero-stat-val">$425</div><div class="hero-stat-lbl">per household connection</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">9.7</div><div class="hero-stat-lbl">people per household</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">99%</div><div class="hero-stat-lbl">system uptime</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">80%+</div><div class="hero-stat-lbl">self-sustaining by 2031</div></div>
     </div>
   </div>
 </section>
 
-<!-- ─── Main ──────────────────────────────────────────────── -->
 <main class="main">
 
-  <!-- 1. Input Card -->
   <div class="card">
     <div class="section-header">
       <div class="section-number">1</div>
-      <span class="section-title">Donation Parameters</span>
+      <span class="section-title">Your Gift</span>
+    </div>
+    <div class="tier-label">Select a giving level</div>
+    <div class="tier-grid" id="tier-grid">
+      <button class="tier-btn" data-amt="10000" onclick="selectTier(this)">
+        <div class="tier-amt">$10K</div><div class="tier-desc">per year</div>
+      </button>
+      <button class="tier-btn" data-amt="25000" onclick="selectTier(this)">
+        <div class="tier-amt">$25K</div><div class="tier-desc">per year</div>
+      </button>
+      <button class="tier-btn" data-amt="50000" onclick="selectTier(this)">
+        <div class="tier-amt">$50K</div><div class="tier-desc">per year</div>
+        <div class="tier-badge">Names a community</div>
+      </button>
+      <button class="tier-btn" data-amt="100000" onclick="selectTier(this)">
+        <div class="tier-amt">$100K</div><div class="tier-desc">per year</div>
+      </button>
+      <button class="tier-btn active" data-amt="167000" onclick="selectTier(this)">
+        <div class="tier-amt">$167K</div><div class="tier-desc">per year</div>
+        <div class="tier-badge">Names a water system</div>
+      </button>
+      <button class="tier-btn" data-amt="0" onclick="selectTier(this)">
+        <div class="tier-amt">Custom</div><div class="tier-desc">enter below</div>
+      </button>
     </div>
     <div class="inputs-grid">
       <div class="field-group">
         <label for="annual-donation" class="field-label">Annual Donation (USD)</label>
-        <input type="number" id="annual-donation" class="field-input" value="5000" min="100" step="100" />
+        <input type="number" id="annual-donation" class="field-input" value="167000" min="100" step="100" oninput="clearTierSelection();recalc()" />
       </div>
       <div class="field-group">
         <label for="donation-period" class="field-label">Donation Period</label>
         <div class="select-wrapper">
-          <select id="donation-period" class="field-select">
-            <option value="1">1 year</option>
-            <option value="2">2 years</option>
-            <option value="3">3 years</option>
-            <option value="4">4 years</option>
-            <option value="5" selected>5 years</option>
-            <option value="7">7 years</option>
+          <select id="donation-period" class="field-select" onchange="recalc()">
+            <option value="1">1 year</option><option value="2">2 years</option>
+            <option value="3" selected>3 years</option><option value="4">4 years</option>
+            <option value="5">5 years</option><option value="7">7 years</option>
             <option value="10">10 years</option>
           </select>
         </div>
@@ -533,44 +341,38 @@ tfoot td:first-child { text-align: left; }
       <div class="field-group">
         <label for="impact-horizon" class="field-label">Project Impact Over</label>
         <div class="select-wrapper">
-          <select id="impact-horizon" class="field-select">
-            <option value="5">5 years</option>
-            <option value="7">7 years</option>
-            <option value="10" selected>10 years</option>
-            <option value="15">15 years</option>
+          <select id="impact-horizon" class="field-select" onchange="recalc()">
+            <option value="5">5 years</option><option value="7">7 years</option>
+            <option value="10" selected>10 years</option><option value="15">15 years</option>
             <option value="20">20 years</option>
           </select>
         </div>
       </div>
     </div>
-    <button class="calc-btn" id="calc-btn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-      </svg>
-      Calculate Impact
-    </button>
-  </div>
-
-  <!-- Empty state -->
-  <div id="empty-state" class="card">
-    <div class="empty-state">
-      <svg width="56" height="56" viewBox="0 0 64 64" fill="none" style="margin:0 auto 1rem;opacity:0.25">
-        <path d="M32 8C32 8 14 26 14 38C14 49.05 22.06 58 32 58C41.94 58 50 49.05 50 38C50 26 32 8 32 8Z" stroke="var(--teal)" stroke-width="2.5" fill="var(--teal)" opacity="0.15"/>
-        <path d="M32 20C32 20 20 31 20 39C20 46.18 25.37 52 32 52" stroke="var(--teal)" stroke-width="2.5" stroke-linecap="round"/>
-      </svg>
-      <p class="empty-text">Enter your donation parameters above</p>
-      <p class="empty-sub">Your full impact breakdown will appear here</p>
+    <div class="named-gift" id="named-gift">
+      <div class="named-gift-icon">🏷️</div>
+      <div class="named-gift-text" id="named-gift-text"></div>
     </div>
   </div>
 
-  <!-- Results area -->
+  <div id="empty-state" class="card" style="display:none">
+    <div class="empty-state">
+      <p class="empty-text">Adjust your gift above</p>
+      <p class="empty-sub">Your impact breakdown will appear here</p>
+    </div>
+  </div>
+
   <div id="results" class="result-area">
 
-    <!-- 2. Equation -->
     <div class="card">
-      <div class="section-header">
+      <div class="people-hero">
+        <div class="people-count" id="people-count">—</div>
+        <div class="people-label">people with permanent access to safe water</div>
+        <div class="people-sub">via <span id="hh-count">—</span> household connections</div>
+      </div>
+      <div class="section-header" style="margin-bottom:var(--sp4)">
         <div class="section-number">2</div>
-        <span class="section-title">How Your Donation Compounds</span>
+        <span class="section-title">How your donation compounds</span>
       </div>
       <div class="equation-row">
         <div class="eq-block hi-primary">
@@ -580,13 +382,13 @@ tfoot td:first-child { text-align: left; }
         </div>
         <div class="eq-operator">+</div>
         <div class="eq-block hi-teal">
-          <span class="eq-label has-tip" data-tip="Debt financing (30% of donation) + customer connection deposits ($80/HH) unlocked alongside your grant.">Sales &amp; Investment Unlocked</span>
+          <span class="eq-label has-tip" data-tip="30% debt financing + $80 customer deposit per household — additional capital mobilized alongside your grant.">Sales &amp; Investment Unlocked</span>
           <span class="eq-value" id="eq-unlocked">—</span>
           <span class="eq-sub">Debt &amp; customer deposits</span>
         </div>
         <div class="eq-operator">+</div>
         <div class="eq-block hi-gold">
-          <span class="eq-label has-tip" data-tip="20% of annual sales retained and reinvested, growing 2%/yr after the donation period ends.">Cumulative Retained Earnings</span>
+          <span class="eq-label has-tip" data-tip="20% of annual sales retained and reinvested, growing 2%/yr after your donation period ends.">Cumulative Retained Earnings</span>
           <span class="eq-value" id="eq-retained">—</span>
           <span class="eq-sub" id="eq-retained-sub">Reinvested over all years</span>
         </div>
@@ -599,7 +401,6 @@ tfoot td:first-child { text-align: left; }
       </div>
     </div>
 
-    <!-- 3. Callout -->
     <div class="impact-callout">
       <div class="callout-left">
         <div class="callout-eyebrow">Total CAPEX Unlocked</div>
@@ -609,354 +410,410 @@ tfoot td:first-child { text-align: left; }
       <div class="callout-right">
         <div>
           <div class="callout-people-value" id="callout-people">—</div>
-          <div class="callout-people-sub" id="callout-people-sub">people served via — households</div>
+          <div class="callout-people-sub" id="callout-people-sub">people served</div>
         </div>
         <div class="multiplier-badge" id="callout-multiplier">—× return on donation</div>
       </div>
     </div>
 
-    <!-- 4. Chart -->
     <div class="card">
-      <div class="section-header">
-        <div class="section-number">3</div>
-        <span class="section-title">Cumulative Impact vs. Donations</span>
-      </div>
-      <div class="legend-row">
-        <div class="legend-item">
-          <div class="legend-dot" style="background:#006D8F"></div>
-          <span>Cumulative Donations</span>
+      <div class="compare-bar">
+        <div class="section-header" style="margin-bottom:0">
+          <div class="section-number">3</div>
+          <span class="section-title">Compare two scenarios</span>
         </div>
-        <div class="legend-item">
-          <div class="legend-dot" style="background:#00B0C8"></div>
-          <span>Cumulative Impact</span>
-        </div>
+        <label class="compare-toggle" onclick="toggleCompare()">
+          <div class="toggle-switch" id="compare-switch"></div>
+          <span>Side-by-side</span>
+        </label>
       </div>
-      <div class="chart-container">
-        <canvas id="impact-chart"></canvas>
+      <div class="compare-panels" id="compare-panels">
+        <div class="compare-panel">
+          <div class="compare-panel-label">Scenario A — Current</div>
+          <div class="compare-inputs">
+            <div class="field-group">
+              <label class="field-label">Annual Gift</label>
+              <input type="number" id="cmp-a-amt" class="field-input" value="167000" min="100" step="100" oninput="recalcCompare()"/>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Years</label>
+              <div class="select-wrapper">
+                <select id="cmp-a-period" class="field-select" onchange="recalcCompare()">
+                  <option value="1">1 year</option><option value="2">2 years</option>
+                  <option value="3" selected>3 years</option><option value="5">5 years</option>
+                  <option value="7">7 years</option><option value="10">10 years</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="compare-result" id="cmp-a-result"></div>
+        </div>
+        <div class="compare-panel" id="cmp-b-panel" style="display:none">
+          <div class="compare-panel-label">Scenario B — Alternative</div>
+          <div class="compare-inputs">
+            <div class="field-group">
+              <label class="field-label">Annual Gift</label>
+              <input type="number" id="cmp-b-amt" class="field-input" value="50000" min="100" step="100" oninput="recalcCompare()"/>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Years</label>
+              <div class="select-wrapper">
+                <select id="cmp-b-period" class="field-select" onchange="recalcCompare()">
+                  <option value="1">1 year</option><option value="2">2 years</option>
+                  <option value="3">3 years</option><option value="5" selected>5 years</option>
+                  <option value="7">7 years</option><option value="10">10 years</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="compare-result" id="cmp-b-result"></div>
+        </div>
       </div>
     </div>
 
-    <!-- 5. Table -->
     <div class="card">
       <div class="section-header">
         <div class="section-number">4</div>
-        <span class="section-title">Year-by-Year Breakdown</span>
+        <span class="section-title">Cumulative Impact vs. Donations</span>
       </div>
-      <div class="table-wrapper">
-        <table id="breakdown-table">
-          <thead>
-            <tr>
-              <th>Year</th>
-              <th>Donation</th>
-              <th>Debt &amp; Customer Deposits</th>
-              <th>Annual Retained Earnings</th>
-              <th>Annual Impact</th>
-              <th>Cumul. Donations</th>
-              <th>Cumul. Impact</th>
-              <th>Multiplier</th>
-            </tr>
-          </thead>
-          <tbody id="table-body"></tbody>
-          <tfoot id="table-foot"></tfoot>
-        </table>
+      <div class="legend-row">
+        <div class="legend-item"><div class="legend-dot" style="background:#006D8F"></div><span>Cumulative Donations</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#00B0C8"></div><span>Cumulative Impact</span></div>
+      </div>
+      <div class="chart-container"><canvas id="impact-chart"></canvas></div>
+    </div>
+
+    <div class="card">
+      <div class="table-toggle" onclick="toggleTable()" role="button" aria-expanded="false" id="table-toggle">
+        <div class="section-header" style="margin-bottom:0">
+          <div class="section-number">5</div>
+          <span class="section-title">Year-by-Year Breakdown</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--sp2)">
+          <span style="font-size:var(--text-xs);color:var(--text-muted)">Show detail</span>
+          <svg class="table-chevron" id="table-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+      <div class="table-content" id="table-content">
+        <div class="table-wrapper">
+          <table id="breakdown-table">
+            <thead>
+              <tr>
+                <th>Year</th><th>Donation</th><th>Debt &amp; Customer Deposits</th>
+                <th>Annual Retained Earnings</th><th>Annual Impact</th>
+                <th>Cumul. Donations</th><th>Cumul. Impact</th><th>Multiplier</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+            <tfoot id="table-foot"></tfoot>
+          </table>
+        </div>
       </div>
     </div>
 
-    <!-- Story -->
     <div class="story-card">
       <div class="story-quote">"Before, I did not have a reliable water source. Now, I can just turn on the taps. It has boosted my business."</div>
       <div class="story-attr">— Augustina, hair salon owner, Daboase, Ghana. After Water4 reached her community she expanded to a second location and employs five people.</div>
     </div>
 
-    <!-- CTA -->
-    <div style="display:flex;gap:12px;flex-wrap:wrap">
-      <a href="https://water4.org/ways-to-give" target="_blank"
-         style="flex:1;min-width:160px;padding:14px 22px;background:var(--teal);color:#fff;border-radius:var(--radius-md);font-weight:500;text-align:center;text-decoration:none;font-size:var(--text-base);">
-        Give on Water4.org →
+    <div class="action-row">
+      <a href="https://water4.org/ways-to-give" target="_blank" class="action-btn primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Give on Water4.org
       </a>
-      <a href="mailto:matt@water4.org?subject=Impact%20Calculator%20Inquiry"
-         style="flex:1;min-width:160px;padding:14px 22px;background:transparent;color:var(--text);border:0.5px solid var(--border);border-radius:var(--radius-md);font-weight:500;text-align:center;text-decoration:none;font-size:var(--text-base);">
-        Talk with Matt →
+      <button class="action-btn secondary" onclick="printSummary()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print Summary
+      </button>
+      <a id="talk-link" href="mailto:matt@water4.org?subject=Water4%20Gift%20Inquiry" class="action-btn talk">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Talk with Matt
       </a>
     </div>
 
-  </div><!-- /results -->
+  </div>
 </main>
 
 <footer class="footer">
   <p>© 2026 Water4 · EIN 26-3260581 · <a href="https://water4.org/privacy-policy" target="_blank">Privacy Policy</a></p>
   <p style="margin-top:4px;">Based on the 5-Year Catalytic Revenue Impact Model. Estimates are illustrative. Actual results vary by region and capital mix.</p>
 </footer>
-
-</div><!-- /page-wrapper -->
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-
 <script>
-/* ─── Theme Toggle ───────────────────────────────────────── */
 (function(){
-  const btn  = document.querySelector('[data-theme-toggle]');
-  const root = document.documentElement;
-  let theme  = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  root.setAttribute('data-theme', theme);
+  const btn=document.querySelector('[data-theme-toggle]');
+  const root=document.documentElement;
+  let theme=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  root.setAttribute('data-theme',theme);
   updateIcon(theme);
-
-  btn && btn.addEventListener('click', () => {
-    theme = theme === 'dark' ? 'light' : 'dark';
-    root.setAttribute('data-theme', theme);
+  btn&&btn.addEventListener('click',()=>{
+    theme=theme==='dark'?'light':'dark';
+    root.setAttribute('data-theme',theme);
     updateIcon(theme);
-    if (window._chart) { window._chart.destroy(); window._chart = null; }
-    if (window._lastResult) renderChart(window._lastResult);
+    if(window._chart){window._chart.destroy();window._chart=null;}
+    if(window._lastResult)renderChart(window._lastResult);
   });
-
-  function updateIcon(t) {
-    if (!btn) return;
-    btn.setAttribute('aria-label', 'Switch to ' + (t === 'dark' ? 'light' : 'dark') + ' mode');
-    btn.innerHTML = t === 'dark'
-      ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
-      : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  function updateIcon(t){
+    if(!btn)return;
+    btn.innerHTML=t==='dark'
+      ?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+      :'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
   }
 })();
 
-/* ─── Model Constants (unchanged from original) ──────────── */
-const DEBT_MULTIPLIER        = 0.30;
-const HH_CONNECTION_COST     = 425;
-const HH_FRACTION            = 0.999;
-const NUMA_FRACTION          = 0.001;
-const NUMA_SYSTEM_COST       = 52000;
-const TARIFF                 = 1.40;
-const HH_MONTHLY_VOL         = 4.4;
-const RETAIL_MONTHLY_VOL     = 40.0;
-const RETAINED_PCT           = 0.20;
-const RETENTION_GROWTH       = 1.02;
-const PEOPLE_PER_HH          = 9.7;
-const CUSTOMER_DEPOSIT_PER_HH = 80;
+const DEBT_MULTIPLIER=0.30,HH_CONNECTION_COST=425,HH_FRACTION=0.999,
+  NUMA_FRACTION=0.001,NUMA_SYSTEM_COST=52000,TARIFF=1.40,HH_MONTHLY_VOL=4.4,
+  RETAIL_MONTHLY_VOL=40.0,RETAINED_PCT=0.20,RETENTION_GROWTH=1.02,
+  PEOPLE_PER_HH=9.7,CUSTOMER_DEPOSIT_PER_HH=80;
 
-/* ─── Calculation Engine (unchanged from original) ───────── */
-function calculate(annualDonation, donationPeriod, horizon) {
-  const years = Math.max(horizon, donationPeriod);
-  const donation = [], debtUnlocked = [], customerDeposit = [], capex = [], hhPerYear = [];
-
-  for (let y = 0; y < years; y++) {
-    const don  = y < donationPeriod ? annualDonation : 0;
-    const debt = don * DEBT_MULTIPLIER;
-    const hhDirect = don > 0 ? (don * HH_FRACTION + debt) / HH_CONNECTION_COST : 0;
-    const custDep  = hhDirect * CUSTOMER_DEPOSIT_PER_HH;
-    const hhCust   = custDep / HH_CONNECTION_COST;
-    donation.push(don);
-    debtUnlocked.push(debt);
-    customerDeposit.push(custDep);
-    capex.push(don + debt + custDep);
-    hhPerYear.push(hhDirect + hhCust);
+function calculate(annualDonation,donationPeriod,horizon){
+  const years=Math.max(horizon,donationPeriod);
+  const donation=[],debtUnlocked=[],customerDeposit=[],capex=[],hhPerYear=[];
+  for(let y=0;y<years;y++){
+    const don=y<donationPeriod?annualDonation:0;
+    const debt=don*DEBT_MULTIPLIER;
+    const hhDirect=don>0?(don*HH_FRACTION+debt)/HH_CONNECTION_COST:0;
+    const custDep=hhDirect*CUSTOMER_DEPOSIT_PER_HH;
+    const hhCust=custDep/HH_CONNECTION_COST;
+    donation.push(don);debtUnlocked.push(debt);
+    customerDeposit.push(custDep);capex.push(don+debt+custDep);
+    hhPerYear.push(hhDirect+hhCust);
   }
-
-  const annualSales = [];
-  let cumHH = 0;
-  for (let y = 0; y < years; y++) {
-    cumHH += hhPerYear[y];
-    const cumCapexSoFar = capex.slice(0, y + 1).reduce((a, b) => a + b, 0);
-    const numaFunded    = (cumCapexSoFar * NUMA_FRACTION) / NUMA_SYSTEM_COST;
-    const hhRevenue     = cumHH * HH_MONTHLY_VOL * TARIFF * 12;
-    const retailRevenue = numaFunded * 3 * RETAIL_MONTHLY_VOL * 0.70 * TARIFF * 12;
-    annualSales.push(hhRevenue + retailRevenue);
+  const annualSales=[];let cumHH=0;
+  for(let y=0;y<years;y++){
+    cumHH+=hhPerYear[y];
+    const cumCapex=capex.slice(0,y+1).reduce((a,b)=>a+b,0);
+    const numaFunded=(cumCapex*NUMA_FRACTION)/NUMA_SYSTEM_COST;
+    const hhRev=cumHH*HH_MONTHLY_VOL*TARIFF*12;
+    const retailRev=numaFunded*3*RETAIL_MONTHLY_VOL*0.70*TARIFF*12;
+    annualSales.push(hhRev+retailRev);
   }
-
-  const annualRetained = [];
-  let baseRetained = 0;
-  for (let y = 0; y < years; y++) {
+  const annualRetained=[];let baseRetained=0;
+  for(let y=0;y<years;y++){
     let retained;
-    if (y < donationPeriod) {
-      retained = annualSales[y] * RETAINED_PCT;
-      baseRetained = retained;
-    } else {
-      const yearsAfter = y - donationPeriod + 1;
-      retained = baseRetained * Math.pow(RETENTION_GROWTH, yearsAfter);
-    }
+    if(y<donationPeriod){retained=annualSales[y]*RETAINED_PCT;baseRetained=retained;}
+    else{retained=baseRetained*Math.pow(RETENTION_GROWTH,y-donationPeriod+1);}
     annualRetained.push(retained);
   }
-
-  let cumRetainedAcc = 0;
-  const cumRetained = annualRetained.map(r => { cumRetainedAcc += r; return cumRetainedAcc; });
-
-  const hhFromRetained = annualRetained.map((r, y) => ((r * (years - y)) / HH_CONNECTION_COST));
-
-  const totalDonations    = donation.reduce((a, b) => a + b, 0);
-  const totalDebtCustomer = debtUnlocked.reduce((a, b) => a + b, 0) + customerDeposit.reduce((a, b) => a + b, 0);
-  const totalCapex        = capex.reduce((a, b) => a + b, 0);
-  const totalCumRetained  = cumRetained[years - 1];
-  const cumulativeImpact  = totalCapex + totalCumRetained;
-  const totalHH           = hhPerYear.reduce((a, b) => a + b, 0) + hhFromRetained.reduce((a, b) => a + b, 0);
-  const totalPeople       = totalHH * PEOPLE_PER_HH;
-  const multiplier        = totalDonations > 0 ? cumulativeImpact / totalDonations : 0;
-
-  const rows = [];
-  let cumDon = 0, cumImpact = 0;
-  for (let y = 0; y < years; y++) {
-    cumDon += donation[y];
-    const annualImpact = capex[y] + annualRetained[y];
-    cumImpact += annualImpact;
-    rows.push({
-      year: y + 1, donation: donation[y],
-      debtCust: debtUnlocked[y] + customerDeposit[y],
-      annualRetained: annualRetained[y], annualImpact,
-      cumDonations: cumDon, cumImpact,
-      multiplier: cumDon > 0 ? cumImpact / cumDon : 0,
-      isDonationYear: y < donationPeriod
-    });
+  let cumRetainedAcc=0;
+  const cumRetained=annualRetained.map(r=>{cumRetainedAcc+=r;return cumRetainedAcc;});
+  const hhFromRetained=annualRetained.map((r,y)=>(r*(years-y))/HH_CONNECTION_COST);
+  const totalDonations=donation.reduce((a,b)=>a+b,0);
+  const totalDebtCustomer=debtUnlocked.reduce((a,b)=>a+b,0)+customerDeposit.reduce((a,b)=>a+b,0);
+  const totalCapex=capex.reduce((a,b)=>a+b,0);
+  const totalCumRetained=cumRetained[years-1];
+  const cumulativeImpact=totalCapex+totalCumRetained;
+  const totalHH=hhPerYear.reduce((a,b)=>a+b,0)+hhFromRetained.reduce((a,b)=>a+b,0);
+  const totalPeople=totalHH*PEOPLE_PER_HH;
+  const multiplier=totalDonations>0?cumulativeImpact/totalDonations:0;
+  const rows=[];let cumDon=0,cumImpact=0;
+  for(let y=0;y<years;y++){
+    cumDon+=donation[y];
+    const annualImpact=capex[y]+annualRetained[y];
+    cumImpact+=annualImpact;
+    rows.push({year:y+1,donation:donation[y],debtCust:debtUnlocked[y]+customerDeposit[y],
+      annualRetained:annualRetained[y],annualImpact,cumDonations:cumDon,cumImpact,
+      multiplier:cumDon>0?cumImpact/cumDon:0,isDonationYear:y<donationPeriod});
   }
-
-  return {
-    totalDonations, totalDebtCustomer, totalCapex, totalCumRetained,
-    cumulativeImpact, multiplier,
-    totalHH: Math.round(totalHH), totalPeople: Math.round(totalPeople),
-    rows, years
-  };
+  return{totalDonations,totalDebtCustomer,totalCapex,totalCumRetained,
+    cumulativeImpact,multiplier,totalHH:Math.round(totalHH),
+    totalPeople:Math.round(totalPeople),rows,years};
 }
 
-/* ─── Formatting (unchanged from original) ───────────────── */
-const fmt  = (n) => '$' + n.toLocaleString('en-US', { maximumFractionDigits: 0 });
-const fmtX = (n) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '×';
-const fmtN = (n) => n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+const fmt=n=>'$'+n.toLocaleString('en-US',{maximumFractionDigits:0});
+const fmtX=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+'×';
+const fmtN=n=>n.toLocaleString('en-US',{maximumFractionDigits:0});
 
-/* ─── Render results ─────────────────────────────────────── */
-function renderResults(r) {
-  window._lastResult = r;
+function animateCount(el,target){
+  const start=performance.now(),duration=600;
+  const startVal=parseInt(el.dataset.val||'0');
+  el.dataset.val=target;
+  function step(now){
+    const p=Math.min((now-start)/duration,1);
+    const ease=1-Math.pow(1-p,3);
+    const cur=Math.round(startVal+(target-startVal)*ease);
+    el.textContent=fmtN(cur);
+    if(p<1)requestAnimationFrame(step);
+    else el.textContent=fmtN(target);
+  }
+  requestAnimationFrame(step);
+}
 
-  document.getElementById('eq-donations').textContent  = fmt(r.totalDonations);
-  document.getElementById('eq-unlocked').textContent   = fmt(r.totalDebtCustomer);
-  document.getElementById('eq-retained').textContent   = fmt(r.totalCumRetained);
-  document.getElementById('eq-impact').textContent     = fmt(r.cumulativeImpact);
-  document.getElementById('eq-retained-sub').textContent = 'Over ' + r.years + ' years';
+function updateNamedGift(annualAmt){
+  const el=document.getElementById('named-gift');
+  const txt=document.getElementById('named-gift-text');
+  if(annualAmt>=167000){
+    txt.innerHTML='At $167K+/year, your gift qualifies to <strong>name a Water4 water system</strong> — a permanent installation serving an entire community, carrying your name or a loved one\'s.';
+    el.classList.add('visible');
+  } else if(annualAmt>=50000){
+    txt.innerHTML='At $50K+/year, your gift qualifies to <strong>name a community water connection</strong> — bringing treated, piped water to homes in a specific village.';
+    el.classList.add('visible');
+  } else {
+    el.classList.remove('visible');
+  }
+}
 
-  document.getElementById('callout-capex').textContent     = fmt(r.totalCapex);
-  document.getElementById('callout-people').textContent    = fmtN(r.totalPeople) + ' people served';
-  document.getElementById('callout-people-sub').innerHTML  = 'via <strong>' + fmtN(r.totalHH) + ' households</strong> connected';
-  document.getElementById('callout-multiplier').textContent = fmtX(r.multiplier) + ' return on donation';
+function updateTalkLink(r){
+  const amt=document.getElementById('annual-donation').value;
+  const period=document.getElementById('donation-period').value;
+  const subject=encodeURIComponent('Water4 Gift Inquiry — $'+Number(amt).toLocaleString()+'/yr × '+period+' years');
+  const body=encodeURIComponent('Hi Matt,\n\nI used the impact calculator and wanted to talk through a potential '+period+'-year commitment of $'+Number(amt).toLocaleString()+'/year.\n\nCalculator showed:\n- '+fmtN(r.totalPeople)+' people served\n- '+fmtX(r.multiplier)+' return on donation\n- '+fmt(r.cumulativeImpact)+' cumulative impact\n\nLooking forward to connecting.');
+  document.getElementById('talk-link').href='mailto:matt@water4.org?subject='+subject+'&body='+body;
+}
 
-  const tbody = document.getElementById('table-body');
-  tbody.innerHTML = '';
-  r.rows.forEach(row => {
-    const tr = document.createElement('tr');
-    if (row.isDonationYear) tr.classList.add('donation-active');
-    tr.innerHTML = `
-      <td>Year ${row.year}${row.isDonationYear ? ' <span style="font-size:11px;color:var(--teal);font-weight:500;">(donating)</span>' : ''}</td>
-      <td>${row.donation > 0 ? fmt(row.donation) : '—'}</td>
-      <td class="${row.debtCust > 0 ? 'positive' : ''}">${row.debtCust > 0 ? fmt(row.debtCust) : '—'}</td>
+function renderResults(r){
+  window._lastResult=r;
+  const pc=document.getElementById('people-count');
+  animateCount(pc,r.totalPeople);
+  pc.classList.remove('count-anim');void pc.offsetWidth;pc.classList.add('count-anim');
+  document.getElementById('hh-count').textContent=fmtN(r.totalHH);
+  document.getElementById('eq-donations').textContent=fmt(r.totalDonations);
+  document.getElementById('eq-unlocked').textContent=fmt(r.totalDebtCustomer);
+  document.getElementById('eq-retained').textContent=fmt(r.totalCumRetained);
+  document.getElementById('eq-impact').textContent=fmt(r.cumulativeImpact);
+  document.getElementById('eq-retained-sub').textContent='Over '+r.years+' years';
+  document.getElementById('callout-capex').textContent=fmt(r.totalCapex);
+  document.getElementById('callout-people').textContent=fmtN(r.totalPeople)+' people served';
+  document.getElementById('callout-people-sub').innerHTML='via <strong>'+fmtN(r.totalHH)+' households</strong> connected';
+  document.getElementById('callout-multiplier').textContent=fmtX(r.multiplier)+' return on donation';
+  const tbody=document.getElementById('table-body');
+  tbody.innerHTML='';
+  r.rows.forEach(row=>{
+    const tr=document.createElement('tr');
+    if(row.isDonationYear)tr.classList.add('donation-active');
+    tr.innerHTML=`<td>Year ${row.year}${row.isDonationYear?` <span style="font-size:10px;color:var(--teal);font-weight:500">(donating)</span>`:''}</td>
+      <td>${row.donation>0?fmt(row.donation):'—'}</td>
+      <td class="${row.debtCust>0?'positive':''}">${row.debtCust>0?fmt(row.debtCust):'—'}</td>
       <td class="positive">${fmt(row.annualRetained)}</td>
       <td class="highlight">${fmt(row.annualImpact)}</td>
       <td>${fmt(row.cumDonations)}</td>
       <td class="highlight">${fmt(row.cumImpact)}</td>
-      <td>${fmtX(row.multiplier)}</td>
-    `;
+      <td>${fmtX(row.multiplier)}</td>`;
     tbody.appendChild(tr);
   });
-
-  document.getElementById('table-foot').innerHTML = `<tr>
-    <td>Total (${r.years}-Year)</td>
-    <td>${fmt(r.totalDonations)}</td>
-    <td>${fmt(r.totalDebtCustomer)}</td>
-    <td>${fmt(r.totalCumRetained)}</td>
-    <td>—</td>
-    <td>${fmt(r.totalDonations)}</td>
-    <td>${fmt(r.cumulativeImpact)}</td>
-    <td>${fmtX(r.multiplier)}</td>
-  </tr>`;
-
+  document.getElementById('table-foot').innerHTML=`<tr>
+    <td>Total (${r.years}-Year)</td><td>${fmt(r.totalDonations)}</td>
+    <td>${fmt(r.totalDebtCustomer)}</td><td>${fmt(r.totalCumRetained)}</td>
+    <td>—</td><td>${fmt(r.totalDonations)}</td>
+    <td>${fmt(r.cumulativeImpact)}</td><td>${fmtX(r.multiplier)}</td></tr>`;
   renderChart(r);
+  updateTalkLink(r);
+  recalcCompare();
 }
 
-/* ─── Chart (logic unchanged, colors updated to brand) ──── */
-function getCSSVar(name) {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
-function renderChart(r) {
-  const ctx = document.getElementById('impact-chart').getContext('2d');
-  if (window._chart) { window._chart.destroy(); window._chart = null; }
-
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  const primaryColor = isDark ? '#38A8CC' : '#006D8F';
-  const accentColor  = isDark ? '#00C4DD' : '#00B0C8';
-  const textMuted    = isDark ? '#7BA0B8' : '#4E6070';
-  const gridColor    = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(10,37,64,0.07)';
-  const surfaceColor = isDark ? '#111F2C' : '#FFFFFF';
-  const textColor    = isDark ? '#D4E5F0' : '#0A2540';
-
-  window._chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: r.rows.map(row => `Yr ${row.year}`),
-      datasets: [
-        {
-          label: 'Cumulative Donations',
-          data: r.rows.map(row => row.cumDonations),
-          borderColor: primaryColor,
-          backgroundColor: primaryColor + '18',
-          borderWidth: 2.5, pointRadius: 4,
-          pointBackgroundColor: primaryColor,
-          pointBorderColor: surfaceColor, pointBorderWidth: 2,
-          fill: false, tension: 0.3,
-        },
-        {
-          label: 'Cumulative Impact',
-          data: r.rows.map(row => row.cumImpact),
-          borderColor: accentColor,
-          backgroundColor: accentColor + '18',
-          borderWidth: 2.5, pointRadius: 4,
-          pointBackgroundColor: accentColor,
-          pointBorderColor: surfaceColor, pointBorderWidth: 2,
-          fill: '+1', tension: 0.3,
-        }
-      ]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: textColor + 'ee',
-          titleColor: surfaceColor, bodyColor: surfaceColor + 'cc',
-          padding: 12, cornerRadius: 8,
-          callbacks: {
-            label: (item) => ' ' + item.dataset.label + ': ' + fmt(item.raw)
-          }
-        }
-      },
-      scales: {
-        x: {
-          grid: { color: gridColor },
-          ticks: { color: textMuted, font: { family: 'DM Sans, sans-serif', size: 12 } }
-        },
-        y: {
-          grid: { color: gridColor },
-          ticks: {
-            color: textMuted,
-            font: { family: 'DM Sans, sans-serif', size: 12 },
-            callback: (v) => '$' + (v >= 1000000 ? (v/1000000).toFixed(1)+'M' : v >= 1000 ? (v/1000).toFixed(0)+'K' : v)
-          }
-        }
-      }
-    }
+function renderChart(r){
+  const ctx=document.getElementById('impact-chart').getContext('2d');
+  if(window._chart){window._chart.destroy();window._chart=null;}
+  const dark=document.documentElement.getAttribute('data-theme')==='dark';
+  const pc=dark?'#38A8CC':'#006D8F',ac=dark?'#00C4DD':'#00B0C8';
+  const tm=dark?'#7BA0B8':'#4E6070',gc=dark?'rgba(255,255,255,.06)':'rgba(10,37,64,.07)';
+  const sc=dark?'#111F2C':'#FFF',tc=dark?'#D4E5F0':'#0A2540';
+  window._chart=new Chart(ctx,{
+    type:'line',
+    data:{labels:r.rows.map(row=>`Yr ${row.year}`),
+      datasets:[
+        {label:'Cumulative Donations',data:r.rows.map(row=>row.cumDonations),
+          borderColor:pc,backgroundColor:pc+'18',borderWidth:2.5,pointRadius:4,
+          pointBackgroundColor:pc,pointBorderColor:sc,pointBorderWidth:2,fill:false,tension:.3},
+        {label:'Cumulative Impact',data:r.rows.map(row=>row.cumImpact),
+          borderColor:ac,backgroundColor:ac+'18',borderWidth:2.5,pointRadius:4,
+          pointBackgroundColor:ac,pointBorderColor:sc,pointBorderWidth:2,fill:'+1',tension:.3}
+      ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},
+        tooltip:{backgroundColor:tc+'ee',titleColor:sc,bodyColor:sc+'cc',padding:12,cornerRadius:8,
+          callbacks:{label:item=>' '+item.dataset.label+': '+fmt(item.raw)}}},
+      scales:{
+        x:{grid:{color:gc},ticks:{color:tm,font:{family:'DM Sans,sans-serif',size:12}}},
+        y:{grid:{color:gc},ticks:{color:tm,font:{family:'DM Sans,sans-serif',size:12},
+          callback:v=>'$'+(v>=1000000?(v/1000000).toFixed(1)+'M':v>=1000?(v/1000).toFixed(0)+'K':v)}}
+      }}
   });
 }
 
-/* ─── Events ─────────────────────────────────────────────── */
-document.getElementById('calc-btn').addEventListener('click', () => {
-  const donation = parseFloat(document.getElementById('annual-donation').value) || 5000;
-  const period   = parseInt(document.getElementById('donation-period').value) || 5;
-  const horizon  = parseInt(document.getElementById('impact-horizon').value) || 10;
-  const result   = calculate(donation, period, Math.max(horizon, period));
+function selectTier(btn){
+  document.querySelectorAll('.tier-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const amt=parseInt(btn.dataset.amt);
+  if(amt>0){document.getElementById('annual-donation').value=amt;recalc();}
+  else{document.getElementById('annual-donation').focus();}
+}
+function clearTierSelection(){
+  document.querySelectorAll('.tier-btn').forEach(b=>b.classList.remove('active'));
+}
 
-  document.getElementById('empty-state').style.display = 'none';
-  const resultsEl = document.getElementById('results');
-  resultsEl.classList.add('visible');
-  renderResults(result);
-  resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-});
+let compareOn=false;
+function toggleCompare(){
+  compareOn=!compareOn;
+  document.getElementById('compare-switch').classList.toggle('on',compareOn);
+  document.getElementById('cmp-b-panel').style.display=compareOn?'':'none';
+  document.getElementById('compare-panels').classList.toggle('two-up',compareOn);
+  if(compareOn)recalcCompare();
+}
+function renderCompareResult(el,r,otherR,isB){
+  const better=isB?r.multiplier>otherR.multiplier:r.multiplier>=otherR.multiplier;
+  el.innerHTML=`
+    <div class="compare-result-row"><span class="compare-result-lbl">People served</span>
+      <span class="compare-result-val ${compareOn&&better?'better':''}">${fmtN(r.totalPeople)}</span></div>
+    <div class="compare-result-row"><span class="compare-result-lbl">Cumulative impact</span>
+      <span class="compare-result-val ${compareOn&&better?'better':''}">${fmt(r.cumulativeImpact)}</span></div>
+    <div class="compare-result-row"><span class="compare-result-lbl">Multiplier</span>
+      <span class="compare-result-val ${compareOn&&better?'better':''}">${fmtX(r.multiplier)}</span></div>
+    <div class="compare-result-row"><span class="compare-result-lbl">Total donated</span>
+      <span class="compare-result-val">${fmt(r.totalDonations)}</span></div>`;
+}
+function recalcCompare(){
+  const horizon=parseInt(document.getElementById('impact-horizon').value)||10;
+  const aAmt=parseFloat(document.getElementById('cmp-a-amt').value)||167000;
+  const aPeriod=parseInt(document.getElementById('cmp-a-period').value)||3;
+  const bAmt=parseFloat(document.getElementById('cmp-b-amt').value)||50000;
+  const bPeriod=parseInt(document.getElementById('cmp-b-period').value)||5;
+  const rA=calculate(aAmt,aPeriod,Math.max(horizon,aPeriod));
+  const rB=calculate(bAmt,bPeriod,Math.max(horizon,bPeriod));
+  renderCompareResult(document.getElementById('cmp-a-result'),rA,rB,false);
+  renderCompareResult(document.getElementById('cmp-b-result'),rB,rA,true);
+}
 
-window.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('calc-btn').click();
+function toggleTable(){
+  const content=document.getElementById('table-content');
+  const chevron=document.getElementById('table-chevron');
+  const toggle=document.getElementById('table-toggle');
+  const isOpen=content.classList.toggle('open');
+  chevron.classList.toggle('open',isOpen);
+  toggle.setAttribute('aria-expanded',isOpen);
+}
+
+function printSummary(){
+  document.getElementById('table-content').classList.add('open');
+  document.getElementById('table-chevron').classList.add('open');
+  window.print();
+}
+
+function recalc(){
+  const donation=parseFloat(document.getElementById('annual-donation').value)||0;
+  const period=parseInt(document.getElementById('donation-period').value)||3;
+  const horizon=parseInt(document.getElementById('impact-horizon').value)||10;
+  if(!donation||donation<100)return;
+  const r=calculate(donation,period,Math.max(horizon,period));
+  document.getElementById('empty-state').style.display='none';
+  const el=document.getElementById('results');
+  el.classList.add('visible');
+  renderResults(r);
+  updateNamedGift(donation);
+  document.getElementById('cmp-a-amt').value=donation;
+  document.getElementById('cmp-a-period').value=period;
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  recalc();
+  document.getElementById('donation-period').addEventListener('change',()=>{
+    document.getElementById('cmp-a-period').value=document.getElementById('donation-period').value;
+  });
 });
 </script>
 </body>
