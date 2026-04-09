@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catalytic Revenue Impact Calculator — Water4</title>
+  <meta name="description" content="Estimate the long-term catalytic impact of grant donations on water infrastructure and communities served." />
+
+  <!-- Fonts: Cabinet Grotesk (headings) + General Sans (body) — clean/modern/impact-finance feel -->
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,600,700,800&f[]=general-sans@400,500,600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ─── Design Tokens ─────────────────────────────────────── */
+    :root {
+      --text-xs:   clamp(0.75rem,  0.7rem  + 0.25vw, 0.875rem);
+      --text-sm:   clamp(0.875rem, 0.8rem  + 0.35vw, 1rem);
+      --text-base: clamp(1rem,     0.95rem + 0.25vw, 1.125rem);
+      --text-lg:   clamp(1.125rem, 1rem    + 0.75vw, 1.5rem);
+      --text-xl:   clamp(1.5rem,   1.2rem  + 1.25vw, 2.25rem);
+
+      --space-1:  0.25rem;
+      --space-2:  0.5rem;
+      --space-3:  0.75rem;
+      --space-4:  1rem;
+      --space-5:  1.25rem;
+      --space-6:  1.5rem;
+      --space-8:  2rem;
+      --space-10: 2.5rem;
+      --space-12: 3rem;
+      --space-16: 4rem;
+
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+      --radius-full: 9999px;
+
+      --transition-interactive: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+
+      --font-display: 'Cabinet Grotesk', 'Helvetica Neue', sans-serif;
+      --font-body:    'General Sans',    'Helvetica Neue', sans-serif;
+
+      /* Water — deep blue-teal with clean whites */
+      --color-bg:              #f0f4f7;
+      --color-surface:         #ffffff;
+      --color-surface-2:       #f8fafc;
+      --color-surface-offset:  #edf2f7;
+      --color-border:          #d0dce8;
+      --color-divider:         #e2eaf2;
+
+      --color-text:            #0d1f2d;
+      --color-text-muted:      #5a7285;
+      --color-text-faint:      #9db3c4;
+      --color-text-inverse:    #ffffff;
+
+      --color-primary:         #006d8f;
+      --color-primary-hover:   #005472;
+      --color-primary-active:  #003d55;
+      --color-primary-highlight: #cce5ef;
+
+      --color-accent:          #00b0c8;
+      --color-accent-hover:    #009aaf;
+      --color-accent-light:    #e0f7fb;
+
+      --color-success:         #2a7d4f;
+      --color-success-light:   #d4eddf;
+      --color-gold:            #c47f00;
+      --color-gold-light:      #fef3d0;
+      --color-purple:          #6b46c1;
+      --color-purple-light:    #ede9f8;
+      --color-orange:          #c25400;
+      --color-orange-light:    #fde8d8;
+
+      --shadow-sm: 0 1px 3px rgba(13, 31, 45, 0.07);
+      --shadow-md: 0 4px 16px rgba(13, 31, 45, 0.10);
+      --shadow-lg: 0 12px 40px rgba(13, 31, 45, 0.14);
+    }
+
+    [data-theme="dark"] {
+      --color-bg:              #0b1720;
+      --color-surface:         #111f2c;
+      --color-surface-2:       #162533;
+      --color-surface-offset:  #0f1d28;
+      --color-border:          #1e3347;
+      --color-divider:         #172940;
+
+      --color-text:            #d4e5f0;
+      --color-text-muted:      #7ba0b8;
+      --color-text-faint:      #3d5f75;
+      --color-text-inverse:    #0d1f2d;
+
+      --color-primary:         #38a8cc;
+      --color-primary-hover:   #4fbdd9;
+      --color-primary-active:  #63d0ea;
+      --color-primary-highlight: #1a3d52;
+
+      --color-accent:          #00c4dd;
+      --color-accent-hover:    #00d8f0;
+      --color-accent-light:    #0d2d36;
+
+      --color-success:         #4db87a;
+      --color-success-light:   #0d2b1a;
+      --color-gold:            #f0a429;
+      --color-gold-light:      #2b1e06;
+      --color-purple:          #9f7ae0;
+      --color-purple-light:    #1e143a;
+      --color-orange:          #f07843;
+      --color-orange-light:    #2b1108;
+
+      --shadow-sm: 0 1px 3px rgba(0,0,0, 0.3);
+      --shadow-md: 0 4px 16px rgba(0,0,0, 0.35);
+      --shadow-lg: 0 12px 40px rgba(0,0,0, 0.4);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme]) {
+        --color-bg:              #0b1720;
+        --color-surface:         #111f2c;
+        --color-surface-2:       #162533;
+        --color-surface-offset:  #0f1d28;
+        --color-border:          #1e3347;
+        --color-divider:         #172940;
+        --color-text:            #d4e5f0;
+        --color-text-muted:      #7ba0b8;
+        --color-text-faint:      #3d5f75;
+        --color-text-inverse:    #0d1f2d;
+        --color-primary:         #38a8cc;
+        --color-primary-hover:   #4fbdd9;
+        --color-primary-active:  #63d0ea;
+        --color-primary-highlight: #1a3d52;
+        --color-accent:          #00c4dd;
+        --color-accent-hover:    #00d8f0;
+        --color-accent-light:    #0d2d36;
+        --color-success:         #4db87a;
+        --color-success-light:   #0d2b1a;
+        --color-gold:            #f0a429;
+        --color-gold-light:      #2b1e06;
+        --color-purple:          #9f7ae0;
+        --color-purple-light:    #1e143a;
+        --color-orange:          #f07843;
+        --color-orange-light:    #2b1108;
+        --shadow-sm: 0 1px 3px rgba(0,0,0, 0.3);
+        --shadow-md: 0 4px 16px rgba(0,0,0, 0.35);
+        --shadow-lg: 0 12px 40px rgba(0,0,0, 0.4);
+      }
+    }
+
+    /* ─── Base Reset ────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100dvh;
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      line-height: 1.6;
+    }
+
+    img, svg { display: block; max-width: 100%; }
+    input, button, select { font: inherit; color: inherit; cursor: pointer; }
+    button { background: none; border: none; }
+
+    a, button, [role="button"], input, select {
+      transition: color var(--transition-interactive),
+                  background var(--transition-interactive),
+                  border-color var(--transition-interactive),
+                  box-shadow var(--transition-interactive),
+                  opacity var(--transition-interactive);
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: 3px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* ─── Layout ────────────────────────────────────────────── */
+    .page-wrapper {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── Header ────────────────────────────────────────────── */
+    .header {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-divider);
+      padding: var(--space-4) var(--space-8);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      text-decoration: none;
+      color: var(--color-text);
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: var(--text-lg);
+      color: var(--color-text);
+      line-height: 1.1;
+    }
+
+    .logo-sub {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .theme-toggle {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-muted);
+      background: var(--color-surface-offset);
+      border: 1px solid var(--color-border);
+    }
+    .theme-toggle:hover {
+      color: var(--color-primary);
+      background: var(--color-primary-highlight);
+      border-color: var(--color-primary);
+    }
+
+    /* ─── Hero Banner ───────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, var(--color-primary) 0%, #004a6e 50%, #002d45 100%);
+      color: #fff;
+      padding: var(--space-12) var(--space-8);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='28' fill='none' stroke='white' stroke-width='0.4' opacity='0.06'/%3E%3C/svg%3E") repeat;
+      pointer-events: none;
+    }
+
+    .hero-content { position: relative; max-width: 680px; margin: 0 auto; }
+
+    .hero-eyebrow {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.65);
+      margin-bottom: var(--space-3);
+    }
+
+    .hero-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: var(--text-xl);
+      line-height: 1.1;
+      color: #fff;
+      margin-bottom: var(--space-4);
+    }
+
+    .hero-desc {
+      font-size: var(--text-base);
+      color: rgba(255,255,255,0.75);
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.65;
+    }
+
+    /* ─── Main Content ──────────────────────────────────────── */
+    .main {
+      flex: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+      padding: var(--space-10) var(--space-8) var(--space-16);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-10);
+    }
+
+    /* ─── Card ──────────────────────────────────────────────── */
+    .card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: var(--text-base);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-6);
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--color-divider);
+    }
+
+    /* ─── Input Form ────────────────────────────────────────── */
+    .inputs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--space-6);
+      margin-bottom: var(--space-8);
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .field-label {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--color-text-muted);
+      letter-spacing: 0.02em;
+    }
+
+    .field-input,
+    .field-select {
+      width: 100%;
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-surface-2);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--text-base);
+      color: var(--color-text);
+      font-weight: 500;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .field-input:focus,
+    .field-select:focus {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px var(--color-primary-highlight);
+    }
+
+    .field-input:hover,
+    .field-select:hover {
+      border-color: var(--color-primary);
+    }
+
+    .select-wrapper {
+      position: relative;
+    }
+
+    .select-wrapper::after {
+      content: '';
+      position: absolute;
+      right: var(--space-4);
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid var(--color-text-muted);
+      pointer-events: none;
+    }
+
+    .calc-btn {
+      width: 100%;
+      padding: var(--space-4) var(--space-8);
+      background: var(--color-primary);
+      color: #fff;
+      border-radius: var(--radius-md);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: var(--text-base);
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      box-shadow: 0 2px 8px rgba(0,109,143,0.3);
+    }
+
+    .calc-btn:hover {
+      background: var(--color-primary-hover);
+      box-shadow: 0 4px 16px rgba(0,109,143,0.4);
+      transform: translateY(-1px);
+    }
+
+    .calc-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 4px rgba(0,109,143,0.2);
+    }
+
+    /* ─── Flow Equation ─────────────────────────────────────── */
+    .flow-section {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .flow-label {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-faint);
+      margin-bottom: var(--space-1);
+    }
+
+    /* Top-level equation: show how everything adds up */
+    .equation-row {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .eq-block {
+      flex: 1;
+      min-width: 140px;
+      background: var(--color-surface-2);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5) var(--space-5);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+      position: relative;
+    }
+
+    .eq-block.highlight-primary {
+      background: var(--color-primary-highlight);
+      border-color: var(--color-primary);
+    }
+
+    .eq-block.highlight-success {
+      background: var(--color-success-light);
+      border-color: var(--color-success);
+    }
+
+    .eq-block.highlight-gold {
+      background: var(--color-gold-light);
+      border-color: var(--color-gold);
+    }
+
+    .eq-block.highlight-accent {
+      background: var(--color-accent-light);
+      border-color: var(--color-accent);
+    }
+
+    .eq-block.highlight-purple {
+      background: var(--color-purple-light);
+      border-color: var(--color-purple);
+    }
+
+    .eq-operator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      font-weight: 700;
+      color: var(--color-text-muted);
+      padding: 0 var(--space-1);
+      flex-shrink: 0;
+      align-self: center;
+    }
+
+    .eq-label {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      line-height: 1.3;
+    }
+
+    .eq-value {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: var(--text-lg);
+      color: var(--color-text);
+      line-height: 1.1;
+    }
+
+    .eq-block.highlight-primary .eq-value { color: var(--color-primary); }
+    .eq-block.highlight-success .eq-value { color: var(--color-success); }
+    .eq-block.highlight-gold .eq-value    { color: var(--color-gold); }
+    .eq-block.highlight-accent .eq-value  { color: var(--color-accent); }
+    .eq-block.highlight-purple .eq-value  { color: var(--color-purple); }
+
+    .eq-sub {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      font-weight: 500;
+    }
+
+    /* Total impact callout */
+    .impact-callout {
+      background: linear-gradient(135deg, var(--color-primary) 0%, #004a6e 100%);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-6);
+      flex-wrap: wrap;
+      color: #fff;
+    }
+
+    .callout-left { flex: 1; min-width: 180px; }
+
+    .callout-eyebrow {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.6);
+      margin-bottom: var(--space-2);
+    }
+
+    .callout-value {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: var(--text-xl);
+      line-height: 1.05;
+      color: #fff;
+    }
+
+    .callout-desc {
+      font-size: var(--text-sm);
+      color: rgba(255,255,255,0.7);
+      margin-top: var(--space-2);
+    }
+
+    .callout-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: var(--space-3);
+      flex-shrink: 0;
+    }
+
+    .callout-people {
+      text-align: right;
+    }
+
+    .callout-people-value {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: var(--text-lg);
+      color: #fff;
+      line-height: 1.1;
+    }
+
+    .callout-people-sub {
+      font-size: var(--text-xs);
+      color: rgba(255,255,255,0.65);
+      margin-top: var(--space-1);
+      line-height: 1.4;
+    }
+
+    .multiplier-badge {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: var(--radius-full);
+      padding: var(--space-2) var(--space-4);
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    /* ─── Chart ─────────────────────────────────────────────── */
+    .chart-container {
+      position: relative;
+      height: 320px;
+      width: 100%;
+    }
+
+    /* ─── Table ─────────────────────────────────────────────── */
+    .table-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: var(--text-sm);
+    }
+
+    thead tr {
+      background: var(--color-surface-offset);
+    }
+
+    thead th {
+      padding: var(--space-3) var(--space-4);
+      text-align: right;
+      font-weight: 700;
+      font-size: var(--text-xs);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      white-space: nowrap;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    thead th:first-child { text-align: left; }
+
+    tbody tr {
+      border-bottom: 1px solid var(--color-divider);
+      transition: background var(--transition-interactive);
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+
+    tbody tr:hover { background: var(--color-surface-2); }
+
+    tbody tr.donation-active { background: color-mix(in oklab, var(--color-primary-highlight), transparent 60%); }
+
+    tbody td {
+      padding: var(--space-3) var(--space-4);
+      text-align: right;
+      color: var(--color-text);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    tbody td:first-child {
+      text-align: left;
+      font-weight: 700;
+      color: var(--color-text-muted);
+    }
+
+    tbody td.positive { color: var(--color-success); font-weight: 600; }
+    tbody td.highlight { color: var(--color-primary); font-weight: 700; }
+
+    tfoot tr { background: var(--color-surface-offset); border-top: 2px solid var(--color-border); }
+    tfoot td {
+      padding: var(--space-3) var(--space-4);
+      text-align: right;
+      font-weight: 700;
+      color: var(--color-text);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    tfoot td:first-child { text-align: left; }
+
+    /* ─── Tooltip (table legend) ────────────────────────────── */
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-4);
+      margin-bottom: var(--space-4);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      font-weight: 500;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: var(--radius-full);
+      flex-shrink: 0;
+    }
+
+    /* ─── Empty / Loading state ─────────────────────────────── */
+    .result-area {
+      display: none;
+    }
+
+    .result-area.visible {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-10);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: var(--space-12) var(--space-8);
+      color: var(--color-text-muted);
+    }
+
+    .empty-icon {
+      margin: 0 auto var(--space-4);
+      opacity: 0.3;
+    }
+
+    .empty-text {
+      font-size: var(--text-base);
+      font-weight: 500;
+    }
+
+    .empty-sub {
+      font-size: var(--text-sm);
+      color: var(--color-text-faint);
+      margin-top: var(--space-2);
+    }
+
+    /* ─── Section divider labels ────────────────────────────── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-6);
+    }
+
+    .section-number {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-full);
+      background: var(--color-primary);
+      color: #fff;
+      font-size: var(--text-xs);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: var(--text-base);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+    }
+
+    /* ─── Annotation tooltip ─────────────────────────────────── */
+    .has-tip {
+      border-bottom: 1.5px dashed var(--color-text-faint);
+      cursor: help;
+      position: relative;
+    }
+
+    .has-tip:hover::after {
+      content: attr(data-tip);
+      position: absolute;
+      bottom: 120%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--color-text);
+      color: var(--color-bg);
+      font-size: var(--text-xs);
+      font-weight: 500;
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-md);
+      white-space: pre-wrap;
+      max-width: 260px;
+      text-align: center;
+      pointer-events: none;
+      z-index: 100;
+      box-shadow: var(--shadow-md);
+    }
+
+    /* ─── Footer ────────────────────────────────────────────── */
+    .footer {
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-divider);
+      padding: var(--space-6) var(--space-8);
+      text-align: center;
+      font-size: var(--text-xs);
+      color: var(--color-text-faint);
+    }
+
+    /* ─── Responsive ────────────────────────────────────────── */
+    @media (max-width: 700px) {
+      .header { padding: var(--space-3) var(--space-5); }
+      .hero { padding: var(--space-8) var(--space-5); }
+      .main { padding: var(--space-8) var(--space-5) var(--space-12); gap: var(--space-8); }
+      .card { padding: var(--space-6) var(--space-5); }
+      .equation-row { flex-direction: column; }
+      .impact-callout { flex-direction: column; }
+      .callout-right { align-items: flex-start; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- Header -->
+  <header class="header">
+    <a href="#" class="header-logo" aria-label="Water4 Home">
+      <!-- SVG Logo: water drop with "4" inside -->
+      <svg class="logo-mark" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Water4 logo">
+        <path d="M18 4C18 4 6 15.5 6 22.5C6 29.4 11.4 34 18 34C24.6 34 30 29.4 30 22.5C30 15.5 18 4 18 4Z" fill="var(--color-primary)" opacity="0.15"/>
+        <path d="M18 7C18 7 8 17.2 8 23.2C8 28.6 12.5 33 18 33C23.5 33 28 28.6 28 23.2C28 17.2 18 7 18 7Z" fill="var(--color-primary)"/>
+        <text x="18" y="26.5" text-anchor="middle" font-family="Cabinet Grotesk, sans-serif" font-weight="800" font-size="13" fill="white">4</text>
+      </svg>
+      <div>
+        <div class="logo-text">Water4</div>
+        <div class="logo-sub">Impact Calculator</div>
+      </div>
+    </a>
+    <button class="theme-toggle" data-theme-toggle aria-label="Switch to dark mode">
+      <!-- Sun icon (default light mode) -->
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      </svg>
+    </button>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <p class="hero-eyebrow">Water Infrastructure Financing</p>
+      <h1 class="hero-title">Catalytic Revenue Impact Calculator</h1>
+      <p class="hero-desc">See exactly how your grant unlocks additional investment, generates retained earnings, and creates lasting water access for communities over time.</p>
+    </div>
+  </section>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Input Card -->
+    <div class="card">
+      <div class="section-header">
+        <div class="section-number">1</div>
+        <span class="section-title">Donation Parameters</span>
+      </div>
+      <div class="inputs-grid">
+        <div class="field-group">
+          <label for="annual-donation" class="field-label">Annual Donation (USD)</label>
+          <input type="number" id="annual-donation" class="field-input" value="5000" min="100" step="100" />
+        </div>
+        <div class="field-group">
+          <label for="donation-period" class="field-label">Donation Period</label>
+          <div class="select-wrapper">
+            <select id="donation-period" class="field-select">
+              <option value="1">1 year</option>
+              <option value="2">2 years</option>
+              <option value="3">3 years</option>
+              <option value="4">4 years</option>
+              <option value="5" selected>5 years</option>
+              <option value="7">7 years</option>
+              <option value="10">10 years</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="impact-horizon" class="field-label">Project Impact Over</label>
+          <div class="select-wrapper">
+            <select id="impact-horizon" class="field-select">
+              <option value="5">5 years</option>
+              <option value="7">7 years</option>
+              <option value="10" selected>10 years</option>
+              <option value="15">15 years</option>
+              <option value="20">20 years</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <button class="calc-btn" id="calc-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        Calculate Impact
+      </button>
+    </div>
+
+    <!-- Empty state (shown before first calc) -->
+    <div id="empty-state" class="card">
+      <div class="empty-state">
+        <svg class="empty-icon" width="64" height="64" viewBox="0 0 64 64" fill="none">
+          <path d="M32 8C32 8 14 26 14 38C14 49.05 22.06 58 32 58C41.94 58 50 49.05 50 38C50 26 32 8 32 8Z" stroke="var(--color-primary)" stroke-width="2.5" fill="var(--color-primary)" opacity="0.08"/>
+          <path d="M32 20C32 20 20 31 20 39C20 46.18 25.37 52 32 52" stroke="var(--color-primary)" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <p class="empty-text">Enter your donation parameters above</p>
+        <p class="empty-sub">Your full impact breakdown will appear here</p>
+      </div>
+    </div>
+
+    <!-- Results Area -->
+    <div id="results" class="result-area">
+
+      <!-- Section 2: Impact Equation -->
+      <div class="card">
+        <div class="section-header">
+          <div class="section-number">2</div>
+          <span class="section-title">How Your Donation Compounds</span>
+        </div>
+
+        <!-- Equation row: Donations + Unlocked + Retained = Cumulative Impact -->
+        <div class="equation-row" id="eq-row">
+
+          <div class="eq-block highlight-primary">
+            <span class="eq-label">Your Donations</span>
+            <span class="eq-value" id="eq-donations">—</span>
+            <span class="eq-sub">Total contributed</span>
+          </div>
+
+          <div class="eq-operator">+</div>
+
+          <div class="eq-block highlight-success">
+            <span class="eq-label has-tip" data-tip="Debt financing and customer deposits your grant unlocks — additional capital mobilized alongside your donation.">Sales &amp; Investment Unlocked</span>
+            <span class="eq-value" id="eq-unlocked">—</span>
+            <span class="eq-sub" id="eq-unlocked-sub">Debt &amp; customer payments</span>
+          </div>
+
+          <div class="eq-operator">+</div>
+
+          <div class="eq-block highlight-gold">
+            <span class="eq-label has-tip" data-tip="Cumulative retained earnings reinvested back into additional household connections across the full impact horizon. Sum of all annual retained earnings.">Cumulative Retained Earnings</span>
+            <span class="eq-value" id="eq-retained">—</span>
+            <span class="eq-sub" id="eq-retained-sub">Reinvested over all years</span>
+          </div>
+
+          <div class="eq-operator">=</div>
+
+          <div class="eq-block highlight-accent">
+            <span class="eq-label">Cumulative Impact</span>
+            <span class="eq-value" id="eq-impact">—</span>
+            <span class="eq-sub">Total value generated</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Section 3: People & multiplier callout -->
+      <div class="impact-callout" id="callout">
+        <div class="callout-left">
+          <div class="callout-eyebrow">Total CAPEX Unlocked</div>
+          <div class="callout-value" id="callout-capex">—</div>
+          <div class="callout-desc" id="callout-capex-desc">Combined grant + debt + customer deposits</div>
+        </div>
+        <div class="callout-right">
+          <div class="callout-people">
+            <div class="callout-people-value" id="callout-people">—</div>
+            <div class="callout-people-sub" id="callout-people-sub">people served<br>via — households connected</div>
+          </div>
+          <div class="multiplier-badge" id="callout-multiplier">—× return on donation</div>
+        </div>
+      </div>
+
+      <!-- Section 4: Chart -->
+      <div class="card">
+        <div class="section-header">
+          <div class="section-number">3</div>
+          <span class="section-title">Cumulative Impact vs. Donations</span>
+        </div>
+        <div class="legend-row">
+          <div class="legend-item">
+            <div class="legend-dot" style="background: var(--color-primary);"></div>
+            <span>Cumulative Donations</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background: var(--color-accent);"></div>
+            <span>Cumulative Impact</span>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="impact-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- Section 5: Year-by-Year Table -->
+      <div class="card">
+        <div class="section-header">
+          <div class="section-number">4</div>
+          <span class="section-title">Year-by-Year Breakdown</span>
+        </div>
+        <div class="table-wrapper">
+          <table id="breakdown-table">
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th>Donation</th>
+                <th>Debt &amp; Customer Payments</th>
+                <th>Annual Retained Earnings</th>
+                <th>Annual Impact</th>
+                <th>Cumul. Donations</th>
+                <th>Cumul. Impact</th>
+                <th>Multiplier</th>
+              </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+            <tfoot id="table-foot"></tfoot>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /results -->
+  </main>
+
+  <footer class="footer">
+    &copy; 2026 Water4 · Based on the 5-Year Catalytic Revenue Impact Model · Estimates are illustrative
+  </footer>
+
+</div><!-- /page-wrapper -->
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+<script>
+/* ─── Theme Toggle ────────────────────────────────────────── */
+(function(){
+  const btn = document.querySelector('[data-theme-toggle]');
+  const root = document.documentElement;
+  let theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  root.setAttribute('data-theme', theme);
+  updateIcon(theme);
+
+  btn && btn.addEventListener('click', () => {
+    theme = theme === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', theme);
+    updateIcon(theme);
+    // re-render chart with new colors
+    if (window._chart) {
+      window._chart.destroy();
+      window._chart = null;
+      if (window._lastResult) renderChart(window._lastResult);
+    }
+  });
+
+  function updateIcon(t) {
+    if (!btn) return;
+    btn.setAttribute('aria-label', 'Switch to ' + (t === 'dark' ? 'light' : 'dark') + ' mode');
+    btn.innerHTML = t === 'dark'
+      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+      : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  }
+})();
+
+/* ─── Model Constants (from Excel) ──────────────────────────── */
+const DEBT_MULTIPLIER     = 0.30;     // 30% of donation unlocked as debt
+const HH_CONNECTION_COST  = 425;      // USD per household connection
+const HH_FRACTION         = 0.999;    // fraction of grant allocated to HH connections
+const NUMA_FRACTION       = 0.001;    // fraction for NUMA system
+const NUMA_SYSTEM_COST    = 52000;    // cost of a NUMA system
+const TARIFF              = 1.40;     // USD / cubic meter
+const HH_MONTHLY_VOL      = 4.4;     // cubic meters / month per HH
+const RETAIL_MONTHLY_VOL  = 40.0;    // cubic meters / month (retail per NUMA system)
+const RETAINED_PCT        = 0.20;    // 20% of annual sales retained
+const RETENTION_GROWTH    = 1.02;    // 2% YoY growth on retained earnings after donation period
+const PEOPLE_PER_HH       = 9.7;     // average household size
+const CUSTOMER_DEPOSIT_PER_HH = 80; // USD customer deposit per HH connection
+
+/* ─── Calculation Engine ───────────────────────────────────── */
+// Closely mirrors the Excel "5 Year Compounding" sheet logic:
+// Donation -> Debt unlocked (30%) -> Customer deposits -> CAPEX
+// Annual sales from cumulative HH installed base
+// Annual retained earnings = 20% of annual sales, growing 2%/yr post-donation
+function calculate(annualDonation, donationPeriod, horizon) {
+  const years = Math.max(horizon, donationPeriod);
+
+  const donation = [], debtUnlocked = [], customerDeposit = [];
+  const capex = [], hhPerYear = [];
+
+  for (let y = 0; y < years; y++) {
+    const don  = y < donationPeriod ? annualDonation : 0;
+    const debt = don * DEBT_MULTIPLIER;
+    const hhDirect = don > 0 ? (don * HH_FRACTION + debt) / HH_CONNECTION_COST : 0;
+    const custDep  = hhDirect * CUSTOMER_DEPOSIT_PER_HH;
+    const hhCust   = custDep / HH_CONNECTION_COST;
+    donation.push(don);
+    debtUnlocked.push(debt);
+    customerDeposit.push(custDep);
+    capex.push(don + debt + custDep);
+    hhPerYear.push(hhDirect + hhCust);
+  }
+
+  // Annual sales based on cumulative installed HH base
+  const annualSales = [];
+  let cumHH = 0;
+  for (let y = 0; y < years; y++) {
+    cumHH += hhPerYear[y];
+    const cumCapexSoFar = capex.slice(0, y+1).reduce((a,b) => a+b, 0);
+    const numaFunded = (cumCapexSoFar * NUMA_FRACTION) / NUMA_SYSTEM_COST;
+    const hhRevenue     = cumHH * HH_MONTHLY_VOL * TARIFF * 12;
+    const retailRevenue = numaFunded * 3 * RETAIL_MONTHLY_VOL * 0.70 * TARIFF * 12;
+    annualSales.push(hhRevenue + retailRevenue);
+  }
+
+  // Annual retained earnings = 20% of annual sales
+  // Post-donation: grows 2% per year from last donation-year retained amount
+  const annualRetained = [];
+  let baseRetained = 0;
+  for (let y = 0; y < years; y++) {
+    let retained;
+    if (y < donationPeriod) {
+      retained = annualSales[y] * RETAINED_PCT;
+      baseRetained = retained;
+    } else {
+      const yearsAfter = y - donationPeriod + 1;
+      retained = baseRetained * Math.pow(RETENTION_GROWTH, yearsAfter);
+    }
+    annualRetained.push(retained);
+  }
+
+  // Cumulative retained earnings
+  let cumRetainedAcc = 0;
+  const cumRetained = annualRetained.map(r => { cumRetainedAcc += r; return cumRetainedAcc; });
+
+  // HH connections from retained earnings re-investment
+  const hhFromRetained = annualRetained.map((r, y) => ((r * (years - y)) / HH_CONNECTION_COST));
+
+  // ── Totals ───────────────────────────────────────────────
+  const totalDonations    = donation.reduce((a,b) => a+b, 0);
+  const totalDebtCustomer = debtUnlocked.reduce((a,b) => a+b, 0) + customerDeposit.reduce((a,b) => a+b, 0);
+  const totalCapex        = capex.reduce((a,b) => a+b, 0);
+  const totalCumRetained  = cumRetained[years - 1];
+  const cumulativeImpact  = totalCapex + totalCumRetained;
+  const totalHH           = hhPerYear.reduce((a,b) => a+b, 0) + hhFromRetained.reduce((a,b) => a+b, 0);
+  const totalPeople       = totalHH * PEOPLE_PER_HH;
+  const multiplier        = totalDonations > 0 ? cumulativeImpact / totalDonations : 0;
+
+  // Year-by-year rows
+  const rows = [];
+  let cumDon = 0, cumImpact = 0;
+  for (let y = 0; y < years; y++) {
+    cumDon += donation[y];
+    const annualImpact = capex[y] + annualRetained[y];
+    cumImpact += annualImpact;
+    rows.push({
+      year: y + 1, donation: donation[y],
+      debtCust: debtUnlocked[y] + customerDeposit[y],
+      annualRetained: annualRetained[y], annualImpact,
+      cumDonations: cumDon, cumImpact,
+      multiplier: cumDon > 0 ? cumImpact / cumDon : 0,
+      isDonationYear: y < donationPeriod
+    });
+  }
+
+  return {
+    totalDonations, totalDebtCustomer, totalCapex, totalCumRetained,
+    cumulativeImpact, multiplier,
+    totalHH: Math.round(totalHH), totalPeople: Math.round(totalPeople),
+    rows, years
+  };
+}
+
+/* ─── Formatting ──────────────────────────────────────────── */
+const fmt = (n) => '$' + n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+const fmtX = (n) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '×';
+const fmtN = (n) => n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+
+/* ─── Render Results ──────────────────────────────────────── */
+function renderResults(r) {
+  window._lastResult = r;
+
+  // Equation row
+  document.getElementById('eq-donations').textContent  = fmt(r.totalDonations);
+  document.getElementById('eq-unlocked').textContent   = fmt(r.totalDebtCustomer);
+  document.getElementById('eq-retained').textContent   = fmt(r.totalCumRetained);
+  document.getElementById('eq-impact').textContent     = fmt(r.cumulativeImpact);
+  document.getElementById('eq-retained-sub').textContent = 'Over ' + r.years + ' years';
+
+  // Callout
+  document.getElementById('callout-capex').textContent    = fmt(r.totalCapex);
+  document.getElementById('callout-capex-desc').textContent = 'Grant + debt + customer deposits';
+  document.getElementById('callout-people').textContent   = fmtN(r.totalPeople) + ' people served';
+  document.getElementById('callout-people-sub').innerHTML  = 'via <strong>' + fmtN(r.totalHH) + ' households</strong> connected';
+  document.getElementById('callout-multiplier').textContent = fmtX(r.multiplier) + ' return on donation';
+
+  // Table
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+  r.rows.forEach(row => {
+    const tr = document.createElement('tr');
+    if (row.isDonationYear) tr.classList.add('donation-active');
+    tr.innerHTML = `
+      <td>Year ${row.year}${row.isDonationYear ? ' <span style="font-size:var(--text-xs);color:var(--color-primary);font-weight:600;">(donating)</span>' : ''}</td>
+      <td>${row.donation > 0 ? fmt(row.donation) : '—'}</td>
+      <td class="${row.debtCust > 0 ? 'positive' : ''}">${row.debtCust > 0 ? fmt(row.debtCust) : '—'}</td>
+      <td class="positive">${fmt(row.annualRetained)}</td>
+      <td class="highlight">${fmt(row.annualImpact)}</td>
+      <td>${fmt(row.cumDonations)}</td>
+      <td class="highlight">${fmt(row.cumImpact)}</td>
+      <td>${fmtX(row.multiplier)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const tfoot = document.getElementById('table-foot');
+  tfoot.innerHTML = `<tr>
+    <td>Total (${r.years}-Year)</td>
+    <td>${fmt(r.totalDonations)}</td>
+    <td>${fmt(r.totalDebtCustomer)}</td>
+    <td>${fmt(r.totalCumRetained)}</td>
+    <td>—</td>
+    <td>${fmt(r.totalDonations)}</td>
+    <td>${fmt(r.cumulativeImpact)}</td>
+    <td>${fmtX(r.multiplier)}</td>
+  </tr>`;
+
+  renderChart(r);
+}
+
+/* ─── Chart ───────────────────────────────────────────────── */
+function getCSSVar(name) {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function renderChart(r) {
+  const ctx = document.getElementById('impact-chart').getContext('2d');
+  if (window._chart) {
+    window._chart.destroy();
+    window._chart = null;
+  }
+
+  const labels      = r.rows.map(row => `Yr ${row.year}`);
+  const cumDonData  = r.rows.map(row => row.cumDonations);
+  const cumImpData  = r.rows.map(row => row.cumImpact);
+
+  const primaryColor = getCSSVar('--color-primary');
+  const accentColor  = getCSSVar('--color-accent');
+  const textMuted    = getCSSVar('--color-text-muted');
+  const divider      = getCSSVar('--color-divider');
+  const surfaceColor = getCSSVar('--color-surface');
+  const textColor    = getCSSVar('--color-text');
+
+  window._chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Cumulative Donations',
+          data: cumDonData,
+          borderColor: primaryColor,
+          backgroundColor: primaryColor + '22',
+          borderWidth: 2.5,
+          pointRadius: 4,
+          pointBackgroundColor: primaryColor,
+          pointBorderColor: surfaceColor,
+          pointBorderWidth: 2,
+          fill: false,
+          tension: 0.3,
+        },
+        {
+          label: 'Cumulative Impact',
+          data: cumImpData,
+          borderColor: accentColor,
+          backgroundColor: accentColor + '22',
+          borderWidth: 2.5,
+          pointRadius: 4,
+          pointBackgroundColor: accentColor,
+          pointBorderColor: surfaceColor,
+          pointBorderWidth: 2,
+          fill: '+1',
+          tension: 0.3,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: textColor + 'ee',
+          titleColor: surfaceColor,
+          bodyColor: surfaceColor + 'cc',
+          padding: 12,
+          cornerRadius: 8,
+          callbacks: {
+            title: (items) => items[0].label,
+            label: (item) => {
+              // Each dataset only shows its own value
+              return ' ' + item.dataset.label + ': ' + fmt(item.raw);
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: divider, drawBorder: false },
+          ticks: { color: textMuted, font: { family: 'General Sans, sans-serif', size: 12 } }
+        },
+        y: {
+          grid: { color: divider, drawBorder: false },
+          ticks: {
+            color: textMuted,
+            font: { family: 'General Sans, sans-serif', size: 12 },
+            callback: (v) => '$' + (v >= 1000 ? (v/1000).toFixed(0) + 'k' : v)
+          }
+        }
+      }
+    }
+  });
+}
+
+/* ─── Main Event ──────────────────────────────────────────── */
+document.getElementById('calc-btn').addEventListener('click', () => {
+  const donation = parseFloat(document.getElementById('annual-donation').value) || 5000;
+  const period   = parseInt(document.getElementById('donation-period').value) || 5;
+  const horizon  = parseInt(document.getElementById('impact-horizon').value) || 10;
+
+  const effectiveHorizon = Math.max(horizon, period);
+
+  const result = calculate(donation, period, effectiveHorizon);
+
+  document.getElementById('empty-state').style.display = 'none';
+  const resultsEl = document.getElementById('results');
+  resultsEl.classList.add('visible');
+
+  renderResults(result);
+
+  // Smooth scroll to results
+  resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+// Auto-calculate on load with defaults
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('calc-btn').click();
+});
+</script>
+<script data-pplx-inline-edit>
+(function(){
+  if(window===window.top)return;
+  function inlineAll(orig,clone){
+    if(orig.nodeType!==1)return;
+    try{
+      var cs=getComputedStyle(orig);
+      var t='';
+      for(var i=0;i<cs.length;i++){t+=cs[i]+':'+cs.getPropertyValue(cs[i])+';';}
+      clone.style.cssText=t;
+    }catch(e){}
+    var oc=orig.children,cc=clone.children;
+    for(var j=0;j<oc.length&&j<cc.length;j++){inlineAll(oc[j],cc[j]);}
+  }
+  function stripExternal(clone){
+    var imgs=clone.querySelectorAll('img');
+    for(var i=0;i<imgs.length;i++){
+      var s=imgs[i].getAttribute('src');
+      if(s&&!s.startsWith('data:'))imgs[i].removeAttribute('src');
+    }
+    var all=clone.querySelectorAll('*');
+    for(var i=0;i<all.length;i++){
+      var st=all[i].style.cssText;
+      if(st&&st.indexOf('url(')>=0){
+        all[i].style.cssText=st.replace(/url\(["']?(?!data:)[^)"']*["']?\)/gi,'none');
+      }
+    }
+  }
+  window.addEventListener('message',function(e){
+    if(!e.data||e.data.type!=='INLINE_EDIT_CAPTURE_REQUEST')return;
+    var scrollX=window.scrollX||window.pageXOffset||0;
+    var scrollY=window.scrollY||window.pageYOffset||0;
+    var w=window.innerWidth,h=window.innerHeight;
+    try{
+      var clone=document.documentElement.cloneNode(true);
+      var rm=clone.querySelectorAll('script,link[rel="stylesheet"],style');
+      for(var i=0;i<rm.length;i++){rm[i].remove();}
+      inlineAll(document.documentElement,clone);
+      stripExternal(clone);
+      var html=new XMLSerializer().serializeToString(clone);
+      var svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'">'
+        +'<foreignObject width="100%" height="100%">'
+        +'<div xmlns="http://www.w3.org/1999/xhtml" style="width:'+w+'px;height:'+h+'px;overflow:hidden">'
+        +'<div style="transform:translate(-'+scrollX+'px,-'+scrollY+'px);transform-origin:top left">'
+        +html+'</div></div></foreignObject></svg>';
+      var svgUrl='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+      var img=new Image();
+      img.onload=function(){
+        var c=document.createElement('canvas');c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0);
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:c.toDataURL('image/png'),scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.onerror=function(){
+        window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+      };
+      img.src=svgUrl;
+    }catch(err){
+      window.parent.postMessage({type:'INLINE_EDIT_SCREENSHOT_RESULT',dataUrl:null,scrollX:scrollX,scrollY:scrollY},'*');
+    }
+  });
+})();
+</script></body>
+</html>
