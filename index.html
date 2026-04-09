@@ -521,7 +521,7 @@ tfoot td:first-child{text-align:left}
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
         Print Summary
       </button>
-      <a id="talk-link" href="mailto:matt@water4.org?subject=Water4%20Gift%20Inquiry" class="action-btn talk">
+      <a id="talk-link" href="https://calendly.com/matthangen/30min" target="_blank" class="action-btn talk">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         Talk with Matt
       </a>
@@ -656,7 +656,8 @@ function updateTalkLink(r){
   const period=document.getElementById('donation-period').value;
   const subject=encodeURIComponent('Water4 Gift Inquiry — $'+Number(amt).toLocaleString()+'/yr × '+period+' years');
   const body=encodeURIComponent('Hi Matt,\n\nI used the impact calculator and wanted to talk through a potential '+period+'-year commitment of $'+Number(amt).toLocaleString()+'/year.\n\nCalculator showed:\n- '+fmtN(r.totalPeople)+' people served\n- '+fmtX(r.multiplier)+' return on donation\n- '+fmt(r.cumulativeImpact)+' cumulative impact\n\nLooking forward to connecting.');
-  document.getElementById('talk-link').href='mailto:matt@water4.org?subject='+subject+'&body='+body;
+  // Calendly link — no dynamic href needed
+  // document.getElementById('talk-link').href='mailto:matt@water4.org?subject='+subject+'&body='+body;
 }
 
 function renderResults(r){
