@@ -297,19 +297,19 @@ tfoot td:first-child{text-align:left}
     <div class="tier-label">Select a giving level</div>
     <div class="tier-grid" id="tier-grid">
       <button class="tier-btn" data-amt="10000" onclick="selectTier(this)">
-        <div class="tier-amt">$10K</div><div class="tier-desc">~23 household connections</div>
+        <div class="tier-amt">$10K</div><div class="tier-desc">~34 households connected</div>
       </button>
       <button class="tier-btn" data-amt="25000" onclick="selectTier(this)">
-        <div class="tier-amt">$25K</div><div class="tier-desc">Ends the walk for ~580 people</div>
+        <div class="tier-amt">$25K</div><div class="tier-desc">~84 households connected</div>
       </button>
       <button class="tier-btn" data-amt="50000" onclick="selectTier(this)">
-        <div class="tier-amt">$50K</div><div class="tier-desc">Connects a village to piped water</div>
+        <div class="tier-amt">$50K</div><div class="tier-desc">~168 households connected</div>
       </button>
       <button class="tier-btn" data-amt="100000" onclick="selectTier(this)">
-        <div class="tier-amt">$100K</div><div class="tier-desc">Builds a water business foundation</div>
+        <div class="tier-amt">$100K</div><div class="tier-desc">~336 households connected</div>
       </button>
       <button class="tier-btn active" data-amt="167000" onclick="selectTier(this)">
-        <div class="tier-amt">$167K</div><div class="tier-desc">Funds a full system installation</div>
+        <div class="tier-amt">$167K</div><div class="tier-desc">~562 households — expands an existing water business</div>
       </button>
       <button class="tier-btn" data-amt="0" onclick="selectTier(this)">
         <div class="tier-amt">Custom</div><div class="tier-desc">Enter your amount</div>
@@ -639,11 +639,16 @@ function animateCount(el,target){
 function updateNamedGift(annualAmt){
   const el=document.getElementById('named-gift');
   const txt=document.getElementById('named-gift-text');
+  const horizon=parseInt(document.getElementById('impact-horizon').value)||10;
+  const period=parseInt(document.getElementById('donation-period').value)||3;
+  const r=window._lastResult;
+  if(!r)return;
+  const horizonLabel='over your selected '+horizon+'-year horizon';
   if(annualAmt>=167000){
-    txt.innerHTML='At $167K+/year, your gift funds a <strong>complete water system installation</strong> — the infrastructure that launches a self-sustaining water business serving an entire community, generating local revenue that keeps it running forever.';
+    txt.innerHTML='At $167K+/year, your gift <strong>expands an existing Water4 water business</strong> — unlocking an estimated <strong>'+fmtN(r.totalPeople)+' people</strong> with permanent safe water access '+horizonLabel+'. The retained earnings keep connecting more households long after your commitment ends.';
     el.classList.add('visible');
   } else if(annualAmt>=50000){
-    txt.innerHTML='At $50K+/year, your gift funds a <strong>full village connection</strong> — treated, piped water at every home, generating local revenue that keeps it running forever.';
+    txt.innerHTML='At $50K+/year, your gift unlocks an estimated <strong>'+fmtN(r.totalPeople)+' people</strong> with permanent safe water access '+horizonLabel+' — through Water4\'s capital stack of debt financing and growing customer revenue.';
     el.classList.add('visible');
   } else {
     el.classList.remove('visible');
