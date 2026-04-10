@@ -582,58 +582,82 @@ const DEBT_MULTIPLIER=0.30,HH_CONNECTION_COST=425,HH_FRACTION=0.999,
   RETAIL_MONTHLY_VOL=40.0,RETAINED_PCT=0.20,RETENTION_GROWTH=1.02,
   PEOPLE_PER_HH=9.7,CUSTOMER_DEPOSIT_PER_HH=80;
 
-function calculate(annualDonation,donationPeriod,horizon){
-  const years=Math.max(horizon,donationPeriod);
-  const donation=[],debtUnlocked=[],customerDeposit=[],capex=[],hhPerYear=[];
-  for(let y=0;y<years;y++){
-    const don=y<donationPeriod?annualDonation:0;
-    const debt=don*DEBT_MULTIPLIER;
-    const hhDirect=don>0?(don*HH_FRACTION+debt)/HH_CONNECTION_COST:0;
-    const custDep=hhDirect*CUSTOMER_DEPOSIT_PER_HH;
-    const hhCust=custDep/HH_CONNECTION_COST;
-    donation.push(don);debtUnlocked.push(debt);
-    customerDeposit.push(custDep);capex.push(don+debt+custDep);
-    hhPerYear.push(hhDirect+hhCust);
+function calculate(annualDonation, donationPeriod, horizon) {
+  const years = Math.max(horizon, donationPeriod);
+
+  function cohortCapex(donation) {
+    const debt       = donation * DEBT_MULTIPLIER;
+    const hhDirect   = (donation * HH_FRACTION + debt) / HH_CONNECTION_COST;
+    const custDep    = hhDirect * CUSTOMER_DEPOSIT_PER_HH;
+    const hhCust     = custDep / HH_CONNECTION_COST;
+    const totalHH    = hhDirect + hhCust;
+    const capex      = donation + debt + custDep;
+    const numaFunded = (capex * NUMA_FRACTION) / NUMA_SYSTEM_COST;
+    const annualSales = (totalHH * HH_MONTHLY_VOL * TARIFF * 12)
+                      + (numaFunded * 3 * RETAIL_MONTHLY_VOL * 0.70 * TARIFF * 12);
+    const baseRetained = annualSales * RETAINED_PCT;
+    return { capex, totalHH, baseRetained };
   }
-  const annualSales=[];let cumHH=0;
-  for(let y=0;y<years;y++){
-    cumHH+=hhPerYear[y];
-    const cumCapex=capex.slice(0,y+1).reduce((a,b)=>a+b,0);
-    const numaFunded=(cumCapex*NUMA_FRACTION)/NUMA_SYSTEM_COST;
-    const hhRev=cumHH*HH_MONTHLY_VOL*TARIFF*12;
-    const retailRev=numaFunded*3*RETAIL_MONTHLY_VOL*0.70*TARIFF*12;
-    annualSales.push(hhRev+retailRev);
+
+  const cohorts = [];
+  for (let d = 0; d < donationPeriod; d++) {
+    cohorts.push({ deployYear: d, ...cohortCapex(annualDonation) });
   }
-  const annualRetained=[];let baseRetained=0;
-  for(let y=0;y<years;y++){
-    let retained;
-    if(y<donationPeriod){retained=annualSales[y]*RETAINED_PCT;baseRetained=retained;}
-    else{retained=baseRetained*Math.pow(RETENTION_GROWTH,y-donationPeriod+1);}
-    annualRetained.push(retained);
+
+  const rows = [];
+  let cumDonations = 0, cumImpact = 0, totalHHDeployed = 0;
+
+  for (let y = 0; y < years; y++) {
+    const donation = y < donationPeriod ? annualDonation : 0;
+    cumDonations += donation;
+
+    let annualCapexThisYear = 0, annualRetainedThisYear = 0, hhThisYear = 0;
+
+    cohorts.forEach(cohort => {
+      const age = y - cohort.deployYear;
+      if (age < 0) return;
+      if (age === 0) {
+        annualCapexThisYear += cohort.capex;
+        hhThisYear += cohort.totalHH;
+      }
+      const retained = age < 5
+        ? cohort.baseRetained
+        : cohort.baseRetained * Math.pow(RETENTION_GROWTH, age - 4);
+      annualRetainedThisYear += retained;
+    });
+
+    totalHHDeployed += hhThisYear;
+    const annualImpact = annualCapexThisYear + annualRetainedThisYear;
+    cumImpact += annualImpact;
+
+    rows.push({
+      year: y + 1, donation,
+      debtCust: annualCapexThisYear > 0
+        ? annualCapexThisYear - donation
+        : 0,
+      annualRetained: annualRetainedThisYear,
+      annualImpact, cumDonations, cumImpact,
+      multiplier: cumDonations > 0 ? cumImpact / cumDonations : 0,
+      isDonationYear: y < donationPeriod
+    });
   }
-  let cumRetainedAcc=0;
-  const cumRetained=annualRetained.map(r=>{cumRetainedAcc+=r;return cumRetainedAcc;});
-  const hhFromRetained=annualRetained.map((r,y)=>(r*(years-y))/HH_CONNECTION_COST);
-  const totalDonations=donation.reduce((a,b)=>a+b,0);
-  const totalDebtCustomer=debtUnlocked.reduce((a,b)=>a+b,0)+customerDeposit.reduce((a,b)=>a+b,0);
-  const totalCapex=capex.reduce((a,b)=>a+b,0);
-  const totalCumRetained=cumRetained[years-1];
-  const cumulativeImpact=totalCapex+totalCumRetained;
-  const totalHH=hhPerYear.reduce((a,b)=>a+b,0)+hhFromRetained.reduce((a,b)=>a+b,0);
-  const totalPeople=totalHH*PEOPLE_PER_HH;
-  const multiplier=totalDonations>0?cumulativeImpact/totalDonations:0;
-  const rows=[];let cumDon=0,cumImpact=0;
-  for(let y=0;y<years;y++){
-    cumDon+=donation[y];
-    const annualImpact=capex[y]+annualRetained[y];
-    cumImpact+=annualImpact;
-    rows.push({year:y+1,donation:donation[y],debtCust:debtUnlocked[y]+customerDeposit[y],
-      annualRetained:annualRetained[y],annualImpact,cumDonations:cumDon,cumImpact,
-      multiplier:cumDon>0?cumImpact/cumDon:0,isDonationYear:y<donationPeriod});
-  }
-  return{totalDonations,totalDebtCustomer,totalCapex,totalCumRetained,
-    cumulativeImpact,multiplier,totalHH:Math.round(totalHH),
-    totalPeople:Math.round(totalPeople),rows,years};
+
+  const totalDonations   = rows.reduce((a,r) => a + r.donation, 0);
+  const totalCapex       = cohorts.reduce((a,c) => a + c.capex, 0);
+  const totalDebtCustomer = totalCapex - totalDonations;
+  const totalCumRetained = cumImpact - totalCapex;
+  const cumulativeImpact = cumImpact;
+  const multiplier       = totalDonations > 0 ? cumulativeImpact / totalDonations : 0;
+  const totalHH          = totalHHDeployed;
+  const totalPeople      = totalHH * PEOPLE_PER_HH;
+
+  return {
+    totalDonations, totalDebtCustomer, totalCapex, totalCumRetained,
+    cumulativeImpact, multiplier,
+    totalHH: Math.round(totalHH),
+    totalPeople: Math.round(totalPeople),
+    rows, years
+  };
 }
 
 const fmt=n=>'$'+n.toLocaleString('en-US',{maximumFractionDigits:0});
