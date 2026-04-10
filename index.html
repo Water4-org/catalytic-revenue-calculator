@@ -279,7 +279,7 @@ tfoot td:first-child{text-align:left}
     <h1 class="hero-title">Catalytic Revenue<br>Impact Calculator</h1>
     <p class="hero-desc">Every dollar you give unlocks more. See exactly how your gift multiplies into lasting water access for thousands of families.</p>
     <div class="hero-stats">
-      <div class="hero-stat"><div class="hero-stat-val">$425</div><div class="hero-stat-lbl">per household connection</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">$420</div><div class="hero-stat-lbl">per household connection</div></div>
       <div class="hero-stat"><div class="hero-stat-val">9.7</div><div class="hero-stat-lbl">people per household</div></div>
       <div class="hero-stat"><div class="hero-stat-val">99%</div><div class="hero-stat-lbl">system uptime</div></div>
       <div class="hero-stat"><div class="hero-stat-val">80%+</div><div class="hero-stat-lbl">self-sustaining by 2031</div></div>
@@ -416,9 +416,9 @@ tfoot td:first-child{text-align:left}
       <div id="methodology-note" style="display:none;margin-top:var(--sp3);padding:var(--sp4);background:var(--surface-2);border:.5px solid var(--border);border-radius:var(--r-md);line-height:1.7;">
         <strong style="font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);">Model Assumptions</strong>
         <ul style="margin-top:var(--sp2);padding-left:var(--sp5);font-size:var(--text-xs);color:var(--text-muted);">
-          <li>Each dollar of donation unlocks <strong>30% in debt financing</strong> alongside it</li>
-          <li>Each household contributes an <strong>$80 customer deposit</strong> toward their connection</li>
-          <li>Household connection cost: <strong>$425</strong></li>
+          <li>Each dollar of donation unlocks <strong>35% in debt financing</strong> alongside it</li>
+          <li>Each household contributes a <strong>$100 customer deposit</strong> toward their connection</li>
+          <li>Household connection cost: <strong>$420</strong></li>
           <li>Average household size: <strong>9.7 people</strong></li>
           <li><strong>20% of annual sales revenue</strong> is retained and reinvested into additional connections</li>
           <li>Retained earnings grow at <strong>2% per year</strong> after the donation period ends</li>
@@ -577,10 +577,10 @@ tfoot td:first-child{text-align:left}
   }
 })();
 
-const DEBT_MULTIPLIER=0.30,HH_CONNECTION_COST=425,HH_FRACTION=0.999,
+const DEBT_MULTIPLIER=0.35,HH_CONNECTION_COST=420,HH_FRACTION=0.999,
   NUMA_FRACTION=0.001,NUMA_SYSTEM_COST=52000,TARIFF=1.40,HH_MONTHLY_VOL=4.4,
   RETAIL_MONTHLY_VOL=40.0,RETAINED_PCT=0.20,RETENTION_GROWTH=1.02,
-  PEOPLE_PER_HH=9.7,CUSTOMER_DEPOSIT_PER_HH=80;
+  PEOPLE_PER_HH=9.7,CUSTOMER_DEPOSIT_PER_HH=100;
 
 function calculate(annualDonation, donationPeriod, horizon) {
   const years = Math.max(horizon, donationPeriod);
@@ -683,15 +683,14 @@ function updateNamedGift(annualAmt){
   const el=document.getElementById('named-gift');
   const txt=document.getElementById('named-gift-text');
   const horizon=parseInt(document.getElementById('impact-horizon').value)||10;
-  const period=parseInt(document.getElementById('donation-period').value)||3;
   const r=window._lastResult;
   if(!r)return;
   const horizonLabel='over your selected '+horizon+'-year horizon';
   if(annualAmt>=167000){
-    txt.innerHTML='At $167K+/year, your gift <strong>expands an existing Water4 water business</strong> — unlocking an estimated <strong>'+fmtN(r.totalPeople)+' people</strong> with permanent safe water access '+horizonLabel+'. The retained earnings keep connecting more households long after your commitment ends.';
+    txt.innerHTML='At $167K+/year, your gift <strong>expands an existing Water4 water business</strong> — unlocking an estimated <strong>'+fmtN(r.totalPeople)+' people</strong> with permanent safe water access '+horizonLabel+'. Based on Water4\'s capital stack model, your donation doubles in catalytic impact in the 5th year as retained earnings accumulate annually.';
     el.classList.add('visible');
   } else if(annualAmt>=50000){
-    txt.innerHTML='At $50K+/year, your gift unlocks an estimated <strong>'+fmtN(r.totalPeople)+' people</strong> with permanent safe water access '+horizonLabel+' — through Water4\'s capital stack of debt financing and growing customer revenue.';
+    txt.innerHTML='At $50K+/year, your gift unlocks an estimated <strong>'+fmtN(r.totalPeople)+' people</strong> with permanent safe water access '+horizonLabel+'. Based on Water4\'s capital stack model, your donation doubles in catalytic impact in the 5th year as retained earnings accumulate annually.';
     el.classList.add('visible');
   } else {
     el.classList.remove('visible');
