@@ -279,7 +279,7 @@ tfoot td:first-child{text-align:left}
     <h1 class="hero-title">Catalytic Revenue<br>Impact Calculator</h1>
     <p class="hero-desc">Every dollar you give unlocks more. See exactly how your gift multiplies into lasting water access for thousands of families.</p>
     <div class="hero-stats">
-      <div class="hero-stat"><div class="hero-stat-val">$420</div><div class="hero-stat-lbl">per household connection</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">$400</div><div class="hero-stat-lbl">per household connection</div></div>
       <div class="hero-stat"><div class="hero-stat-val">9.7</div><div class="hero-stat-lbl">people per household</div></div>
       <div class="hero-stat"><div class="hero-stat-val">99%</div><div class="hero-stat-lbl">system uptime</div></div>
       <div class="hero-stat"><div class="hero-stat-val">80%+</div><div class="hero-stat-lbl">self-sustaining by 2031</div></div>
@@ -297,19 +297,19 @@ tfoot td:first-child{text-align:left}
     <div class="tier-label">Select a giving level</div>
     <div class="tier-grid" id="tier-grid">
       <button class="tier-btn" data-amt="10000" onclick="selectTier(this)">
-        <div class="tier-amt">$10K</div><div class="tier-desc">~34 households connected</div>
+        <div class="tier-amt">$10K</div><div class="tier-desc">~36 households connected</div>
       </button>
       <button class="tier-btn" data-amt="25000" onclick="selectTier(this)">
-        <div class="tier-amt">$25K</div><div class="tier-desc">~84 households connected</div>
+        <div class="tier-amt">$25K</div><div class="tier-desc">~89 households connected</div>
       </button>
       <button class="tier-btn" data-amt="50000" onclick="selectTier(this)">
-        <div class="tier-amt">$50K</div><div class="tier-desc">~168 households connected</div>
+        <div class="tier-amt">$50K</div><div class="tier-desc">~178 households connected</div>
       </button>
       <button class="tier-btn" data-amt="100000" onclick="selectTier(this)">
-        <div class="tier-amt">$100K</div><div class="tier-desc">~336 households connected</div>
+        <div class="tier-amt">$100K</div><div class="tier-desc">~355 households connected</div>
       </button>
       <button class="tier-btn active" data-amt="167000" onclick="selectTier(this)">
-        <div class="tier-amt">$167K</div><div class="tier-desc">~562 households — expands an existing water business</div>
+        <div class="tier-amt">$167K</div><div class="tier-desc">~594 households — expands an existing water business</div>
       </button>
       <button class="tier-btn" data-amt="0" onclick="selectTier(this)">
         <div class="tier-amt">Custom</div><div class="tier-desc">Enter your amount</div>
@@ -416,13 +416,15 @@ tfoot td:first-child{text-align:left}
       <div id="methodology-note" style="display:none;margin-top:var(--sp3);padding:var(--sp4);background:var(--surface-2);border:.5px solid var(--border);border-radius:var(--r-md);line-height:1.7;">
         <strong style="font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);">Model Assumptions</strong>
         <ul style="margin-top:var(--sp2);padding-left:var(--sp5);font-size:var(--text-xs);color:var(--text-muted);">
-          <li>Each dollar of donation unlocks <strong>35% in debt financing</strong> alongside it</li>
-          <li>Each household contributes a <strong>$100 customer deposit</strong> toward their connection</li>
-          <li>Household connection cost: <strong>$420</strong></li>
+          <li>Your donation immediately unlocks <strong>35% in debt financing</strong> — deployed alongside your gift into new infrastructure</li>
+          <li>New households contribute a <strong>$100 customer deposit</strong> in year one, <strong>$80</strong> in subsequent years — further expanding the HH base</li>
+          <li>Household connection cost: <strong>$400</strong></li>
           <li>Average household size: <strong>9.7 people</strong></li>
-          <li><strong>20% of annual sales revenue</strong> is retained and reinvested into additional connections</li>
+          <li><strong>20% of annual sales revenue</strong> is retained and reinvested exclusively into <strong>new household connections</strong> — not O&M or debt service</li>
           <li>Retained earnings grow at <strong>2% per year</strong> after the donation period ends</li>
-          <li>People figures reflect cumulative impact across the full selected horizon</li>
+          <li>Impact is measured as <strong>new water access only</strong> — households funded by immediate leverage plus retained earnings reinvestment. O&M costs and debt service are excluded.</li>
+          <li>A lump-sum gift reaches <strong>1.7× impact immediately</strong> from leverage alone, and doubles new access <strong>within 5 years</strong> as retained earnings compound</li>
+          <li>Multi-year gifts spread deployment across cohorts — each cohort follows the same doubling curve independently</li>
         </ul>
         <p style="margin-top:var(--sp3);font-size:var(--text-xs);color:var(--text-faint);">Based on Water4's 5-Year Catalytic Revenue Impact Model. Estimates are illustrative and vary by region and capital mix.</p>
       </div>
@@ -577,7 +579,7 @@ tfoot td:first-child{text-align:left}
   }
 })();
 
-const DEBT_MULTIPLIER=0.35,HH_CONNECTION_COST=420,HH_FRACTION=0.999,
+const DEBT_MULTIPLIER=0.35,HH_CONNECTION_COST=400,HH_FRACTION=0.999,
   NUMA_FRACTION=0.001,NUMA_SYSTEM_COST=52000,TARIFF=1.40,HH_MONTHLY_VOL=4.4,
   RETAIL_MONTHLY_VOL=40.0,RETAINED_PCT=0.20,RETENTION_GROWTH=1.02,
   PEOPLE_PER_HH=9.7,CUSTOMER_DEPOSIT_PER_HH=100;
@@ -585,71 +587,73 @@ const DEBT_MULTIPLIER=0.35,HH_CONNECTION_COST=420,HH_FRACTION=0.999,
 function calculate(annualDonation, donationPeriod, horizon) {
   const years = Math.max(horizon, donationPeriod);
 
-  function cohortCapex(donation) {
-    const debt       = donation * DEBT_MULTIPLIER;
-    const hhDirect   = (donation * HH_FRACTION + debt) / HH_CONNECTION_COST;
-    const custDep    = hhDirect * CUSTOMER_DEPOSIT_PER_HH;
-    const hhCust     = custDep / HH_CONNECTION_COST;
-    const totalHH    = hhDirect + hhCust;
-    const capex      = donation + debt + custDep;
+  function cohortData(don, isFirstYear) {
+    const debt = don * DEBT_MULTIPLIER;
+    const hhDirect = (don * HH_FRACTION + debt) / HH_CONNECTION_COST;
+    const custDep = hhDirect * (isFirstYear ? 100 : 80);
+    const hhCust = custDep / HH_CONNECTION_COST;
+    const totalHH = hhDirect + hhCust;
+    const capex = don + debt + custDep;
     const numaFunded = (capex * NUMA_FRACTION) / NUMA_SYSTEM_COST;
     const annualSales = (totalHH * HH_MONTHLY_VOL * TARIFF * 12)
                       + (numaFunded * 3 * RETAIL_MONTHLY_VOL * 0.70 * TARIFF * 12);
-    const baseRetained = annualSales * RETAINED_PCT;
-    return { capex, totalHH, baseRetained };
+    return { totalHH, capex, baseRetained: annualSales * RETAINED_PCT };
   }
 
   const cohorts = [];
   for (let d = 0; d < donationPeriod; d++) {
-    cohorts.push({ deployYear: d, ...cohortCapex(annualDonation) });
+    cohorts.push({ deployYear: d, ...cohortData(annualDonation, d === 0) });
   }
 
   const rows = [];
-  let cumDonations = 0, cumImpact = 0, totalHHDeployed = 0;
+  let cumDon = 0, cumDirectHH = 0, cumRetainedHH = 0;
 
   for (let y = 0; y < years; y++) {
-    const donation = y < donationPeriod ? annualDonation : 0;
-    cumDonations += donation;
+    const don = y < donationPeriod ? annualDonation : 0;
+    cumDon += don;
 
-    let annualCapexThisYear = 0, annualRetainedThisYear = 0, hhThisYear = 0;
+    let directHHThisYear = 0, retainedHHThisYear = 0, capexThisYear = 0;
 
     cohorts.forEach(cohort => {
       const age = y - cohort.deployYear;
       if (age < 0) return;
       if (age === 0) {
-        annualCapexThisYear += cohort.capex;
-        hhThisYear += cohort.totalHH;
+        directHHThisYear += cohort.totalHH;
+        capexThisYear += cohort.capex;
       }
       const retained = age < 5
         ? cohort.baseRetained
         : cohort.baseRetained * Math.pow(RETENTION_GROWTH, age - 4);
-      annualRetainedThisYear += retained;
+      retainedHHThisYear += retained / HH_CONNECTION_COST;
     });
 
-    totalHHDeployed += hhThisYear;
-    const annualImpact = annualCapexThisYear + annualRetainedThisYear;
-    cumImpact += annualImpact;
+    cumDirectHH += directHHThisYear;
+    cumRetainedHH += retainedHHThisYear;
+    const cumNewHH = cumDirectHH + cumRetainedHH;
+    const cumNewPeople = cumNewHH * PEOPLE_PER_HH;
+
+    const debtCust = capexThisYear > 0 ? capexThisYear - don : 0;
+    const annualRetained = retainedHHThisYear * HH_CONNECTION_COST;
+    const annualImpact = capexThisYear + annualRetained;
+    const cumImpact = (cumNewHH * HH_CONNECTION_COST);
+    const multiplier = cumDon > 0 ? cumImpact / cumDon : 0;
 
     rows.push({
-      year: y + 1, donation,
-      debtCust: annualCapexThisYear > 0
-        ? annualCapexThisYear - donation
-        : 0,
-      annualRetained: annualRetainedThisYear,
-      annualImpact, cumDonations, cumImpact,
-      multiplier: cumDonations > 0 ? cumImpact / cumDonations : 0,
-      isDonationYear: y < donationPeriod
+      year: y + 1, donation: don, debtCust,
+      annualRetained, annualImpact,
+      cumDonations: cumDon, cumImpact,
+      multiplier, isDonationYear: y < donationPeriod
     });
   }
 
-  const totalDonations   = rows.reduce((a,r) => a + r.donation, 0);
-  const totalCapex       = cohorts.reduce((a,c) => a + c.capex, 0);
+  const totalDonations = cohorts.reduce((a, c) => a + annualDonation, 0);
+  const totalCapex = cohorts.reduce((a, c) => a + c.capex, 0);
   const totalDebtCustomer = totalCapex - totalDonations;
-  const totalCumRetained = cumImpact - totalCapex;
-  const cumulativeImpact = cumImpact;
-  const multiplier       = totalDonations > 0 ? cumulativeImpact / totalDonations : 0;
-  const totalHH          = totalHHDeployed;
-  const totalPeople      = totalHH * PEOPLE_PER_HH;
+  const totalHH = cumDirectHH + cumRetainedHH;
+  const totalPeople = totalHH * PEOPLE_PER_HH;
+  const cumulativeImpact = totalHH * HH_CONNECTION_COST;
+  const totalCumRetained = cumRetainedHH * HH_CONNECTION_COST;
+  const multiplier = totalDonations > 0 ? cumulativeImpact / totalDonations : 0;
 
   return {
     totalDonations, totalDebtCustomer, totalCapex, totalCumRetained,
@@ -687,10 +691,10 @@ function updateNamedGift(annualAmt){
   if(!r)return;
   const horizonLabel='over your selected '+horizon+'-year horizon';
   if(annualAmt>=167000){
-    txt.innerHTML='At $167K+/year, your gift <strong>expands an existing Water4 water business</strong> — unlocking an estimated <strong>'+fmtN(r.totalPeople)+' people</strong> with permanent safe water access '+horizonLabel+'. Based on Water4\'s capital stack model, your donation doubles in catalytic impact in the 5th year as retained earnings accumulate annually.';
+    txt.innerHTML='At $167K+/year, your gift <strong>expands an existing Water4 water business</strong> — unlocking an estimated <strong>'+fmtN(r.totalPeople)+' people</strong> with permanent safe water access '+horizonLabel+'. Immediate leverage from debt financing and customer deposits delivers 1.7× impact on day one — retained earnings compound that to 2× new access within 5 years.';
     el.classList.add('visible');
   } else if(annualAmt>=50000){
-    txt.innerHTML='At $50K+/year, your gift unlocks an estimated <strong>'+fmtN(r.totalPeople)+' people</strong> with permanent safe water access '+horizonLabel+'. Based on Water4\'s capital stack model, your donation doubles in catalytic impact in the 5th year as retained earnings accumulate annually.';
+    txt.innerHTML='At $50K+/year, your gift unlocks an estimated <strong>'+fmtN(r.totalPeople)+' people</strong> with permanent safe water access '+horizonLabel+'. Immediate leverage from debt financing and customer deposits delivers 1.7× impact on day one — retained earnings compound that to 2× new access within 5 years.';
     el.classList.add('visible');
   } else {
     el.classList.remove('visible');
